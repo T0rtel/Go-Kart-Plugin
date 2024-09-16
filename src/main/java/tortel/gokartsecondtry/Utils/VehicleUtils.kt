@@ -3,34 +3,72 @@ package tortel.gokartsecondtry.Utils
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.util.Vector
-import tortel.gokartsecondtry.Main
 
 
 object VehicleUtils {
 
+    val PlayersAccelerating = mutableListOf<Player>()
+    val PlayersDecelerating = listOf<Player>()
+    val PlayersVelocities = mutableMapOf<Player, Double>()
+
+    val Acceleration = 0.001 //per tick
+    val deceleration = 0.005
+    val MaxSpeed = 0.05
+    val MaxRotationSpeed = 15f
 
 
     fun MoveForward(plr : Player){
+        if (!PlayersAccelerating.contains(plr)){
+            PlayersAccelerating.add(plr)
+        }
+
         val ArmorStand = getplrVehicle(plr)!! //TODO: IMPROVE
         val x = ArmorStand.location.direction.x
         val z = ArmorStand.location.direction.z
-        ArmorStand.velocity = Vector(x,-1.0,z + 0.1)
+        IncreaseVel(plr)
+        ArmorStand.velocity = Vector(x,-0.5,z + PlayersVelocities[plr]!!)
+        PlayersAccelerating.plus(plr)
     }
 
     fun SteerRight(plr : Player){
         val ArmorStand = getplrVehicle(plr)!!
 
+        if (PlayersAccelerating.contains(plr)){
 
-        ArmorStand.setRotation(ArmorStand.yaw + 15.0f, 0.0f)
+            val RotationSpeed = MaxRotationSpeed
+
+            ArmorStand.setRotation(ArmorStand.yaw + RotationSpeed, 0.0f)
+        }
 
     }
 
     fun SteerLeft(plr : Player){
         val ArmorStand = getplrVehicle(plr)!!
 
+        if (PlayersAccelerating.contains(plr)){
 
-        ArmorStand.setRotation(ArmorStand.yaw - 15.0f, 0.0f)
+            val RotationSpeed = MaxRotationSpeed
 
+            ArmorStand.setRotation(ArmorStand.yaw - RotationSpeed, 0.0f)
+        }
+    }
+
+    fun IncreaseVel(plr : Player){
+        PlayersVelocities[plr]?.let { velocity ->
+            if (velocity < MaxSpeed) {
+                PlayersVelocities[plr] = (velocity + Acceleration).coerceAtMost(MaxSpeed)
+                println("$velocity")
+            }
+        }
+
+    }
+
+    fun DecreaseVel(player: Player) {
+        PlayersVelocities[player]?.let { velocity ->
+            if (velocity > 0) {
+                PlayersVelocities[player] = (velocity - deceleration).coerceAtLeast(0.0)
+            }
+        }
     }
 
     fun getplrVehicle(plr : Player): Entity? {

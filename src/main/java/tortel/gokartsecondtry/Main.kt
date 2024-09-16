@@ -5,8 +5,13 @@ import com.comphenix.protocol.ProtocolManager
 import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.scheduler.BukkitRunnable
 import tortel.gokartsecondtry.Commands.RideCommand
-import tortel.gokartsecondtry.Listeners.PlayerVehicleMove
+import tortel.gokartsecondtry.Listeners.PlayerJoinEvent
+import tortel.gokartsecondtry.Listeners.PlayerSpaceHeld
+import tortel.gokartsecondtry.Listeners.PlayerVehicleInput
+import tortel.gokartsecondtry.Listeners.UnHeldKeyEvent
+import tortel.gokartsecondtry.Utils.VehicleUtils
 import java.io.File
 
 class Main : JavaPlugin() {
@@ -26,6 +31,7 @@ class Main : JavaPlugin() {
 
         registerEvents()
         registerCommands()
+        setupTickSystem()
         logger.info("GoKart Plugin Enabled!")
     }
 
@@ -34,11 +40,38 @@ class Main : JavaPlugin() {
     }
 
     fun registerEvents(){
-       protocolManager!!.addPacketListener(PlayerVehicleMove(this))
-        //pluginmanager.registerEvents(PlayerVehicleMove(), this)
+        protocolManager!!.addPacketListener(PlayerVehicleInput(this))
+        protocolManager!!.addPacketListener(UnHeldKeyEvent(this))
+        pluginmanager.registerEvents(PlayerJoinEvent(), this)
+        pluginmanager.registerEvents(PlayerSpaceHeld(), this)
+
     }
 
     fun registerCommands(){
         getCommand("ride")?.setExecutor(RideCommand())
+    }
+
+    fun setupTickSystem(){
+        object : BukkitRunnable() {
+            override fun run() {
+
+                Bukkit.getOnlinePlayers().forEach {
+                    val plr = it
+
+                    //plr isn't accelerating
+                    if (!VehicleUtils.PlayersAccelerating.contains(plr) && VehicleUtils.PlayersVelocities.get(plr) != 0.0) {
+
+                        if (VehicleUtils.PlayersVelocities.contains(plr)){
+                            VehicleUtils.DecreaseVel(plr)
+                        }
+
+                    }
+
+                    VehicleUtils.PlayersAccelerating.remove(plr)
+                }
+
+            }
+        }.runTaskTimer(this, 1, 1)
+
     }
 }
