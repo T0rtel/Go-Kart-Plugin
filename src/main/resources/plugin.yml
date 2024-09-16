@@ -1,0 +1,8 @@
+name: GoKart
+version: '${project.version}'
+main: tortel.gokartsecondtry.Main
+api-version: '1.21'
+
+commands:
+  ride:
+    description: ride.
