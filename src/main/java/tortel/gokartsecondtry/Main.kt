@@ -63,7 +63,7 @@ class Main : JavaPlugin() {
 
                     //plr deceleration
                     if (!VehicleUtils.PlayersAccelerating.contains(plr) && VehicleUtils.PlayersVelocities.get(plr) != 0.0) {
-
+                        println("Decelerate plr")
                         //deceleration
                         VehicleUtils.DecreaseVel(plr)
 

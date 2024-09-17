@@ -11,10 +11,11 @@ object VehicleUtils {
     val PlayersAccelerating = mutableListOf<Player>()
     val PlayersVelocities = mutableMapOf<Player, Double>()
 
-    val Acceleration = 0.001 //per tick
-    val deceleration = 0.001
-    val MaxSpeed = 0.05
-    val MaxRotationSpeed = 15f
+    val Acceleration = 0.01 //per tick
+    val deceleration = 0.005
+    val MaxSpeed = 1.0 // 1 * 20 = 20 blocks/second
+    val MaxRotationSpeed = 10f
+    val bouncePower = -2.5
 
 
     fun MoveForward(plr : Player){
@@ -27,12 +28,12 @@ object VehicleUtils {
         val z = ArmorStand.location.direction.z
         val bounce = BounceBackIfWallAhead(plr)
         if (bounce){
-            ArmorStand.velocity = Vector(x,-0.5,-5.0)
+            ArmorStand.velocity =  Vector(x,0.0,z).multiply(Vector(bouncePower,-0.5,bouncePower))
             PlayersAccelerating.remove(plr)
             return
         }
         IncreaseVel(plr)
-        ArmorStand.velocity = Vector(x,-0.5,z + PlayersVelocities[plr]!!)
+        ArmorStand.velocity =  Vector(x,0.0,z).multiply(Vector(PlayersVelocities[plr]!!,-0.5,PlayersVelocities[plr]!!))
 
     }
 
