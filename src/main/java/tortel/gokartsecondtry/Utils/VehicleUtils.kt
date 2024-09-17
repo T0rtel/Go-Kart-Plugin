@@ -12,7 +12,7 @@ object VehicleUtils {
     val PlayersVelocities = mutableMapOf<Player, Double>()
 
     val Acceleration = 0.01 //per tick
-    val deceleration = 0.005
+    val deceleration = 0.03
     val MaxSpeed = 1.0 // 1 * 20 = 20 blocks/second
     val MaxRotationSpeed = 10f
     val bouncePower = -2.5
@@ -74,6 +74,7 @@ object VehicleUtils {
         PlayersVelocities[plr]?.let { velocity ->
             if (velocity > 0) {
                 PlayersVelocities[plr] = (velocity - deceleration).coerceAtLeast(0.0)
+                getplrVehicle(plr)!!.velocity =  Vector(getplrVehicle(plr)!!.location.direction.x,0.0,getplrVehicle(plr)!!.location.direction.z).multiply(Vector(PlayersVelocities[plr]!!,-0.5,PlayersVelocities[plr]!!))
             }
         }
     }
