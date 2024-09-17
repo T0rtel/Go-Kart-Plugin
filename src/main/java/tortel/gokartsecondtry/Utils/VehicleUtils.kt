@@ -1,5 +1,6 @@
 package tortel.gokartsecondtry.Utils
 
+
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.util.Vector
@@ -8,11 +9,10 @@ import org.bukkit.util.Vector
 object VehicleUtils {
 
     val PlayersAccelerating = mutableListOf<Player>()
-    val PlayersDecelerating = listOf<Player>()
     val PlayersVelocities = mutableMapOf<Player, Double>()
 
     val Acceleration = 0.001 //per tick
-    val deceleration = 0.005
+    val deceleration = 0.001
     val MaxSpeed = 0.05
     val MaxRotationSpeed = 15f
 
@@ -25,9 +25,15 @@ object VehicleUtils {
         val ArmorStand = getplrVehicle(plr)!! //TODO: IMPROVE
         val x = ArmorStand.location.direction.x
         val z = ArmorStand.location.direction.z
+        val bounce = BounceBackIfWallAhead(plr)
+        if (bounce){
+            ArmorStand.velocity = Vector(x,-0.5,-5.0)
+            PlayersAccelerating.remove(plr)
+            return
+        }
         IncreaseVel(plr)
         ArmorStand.velocity = Vector(x,-0.5,z + PlayersVelocities[plr]!!)
-        PlayersAccelerating.plus(plr)
+
     }
 
     fun SteerRight(plr : Player){
@@ -63,16 +69,45 @@ object VehicleUtils {
 
     }
 
-    fun DecreaseVel(player: Player) {
-        PlayersVelocities[player]?.let { velocity ->
+    fun DecreaseVel(plr: Player) {
+        PlayersVelocities[plr]?.let { velocity ->
             if (velocity > 0) {
-                PlayersVelocities[player] = (velocity - deceleration).coerceAtLeast(0.0)
+                PlayersVelocities[plr] = (velocity - deceleration).coerceAtLeast(0.0)
             }
         }
     }
 
+    fun BounceBackIfWallAhead(plr : Player) : Boolean{
+        val vehicle = getplrVehicle(plr) ?: return false
+        if (vehicle.world.rayTraceBlocks(vehicle.location, vehicle.location.direction, 1.0) == null) return false
+        val blockAhead = vehicle.world.rayTraceBlocks(vehicle.location, vehicle.location.direction, 1.0)!!.hitBlock ?: return false//.add(0.0,0.0,1.0).block.type
+        val blockAboveBlockAhead = blockAhead.location.add(0.0,1.0,0.0).block.type
+
+        //println("${blockAhead.type}, $blockAboveBlockAhead")
+
+        if (blockAhead.isCollidable && blockAhead.isSolid){
+
+            if (blockAboveBlockAhead.isCollidable && blockAboveBlockAhead.isSolid){
+                println("HIT WALL")
+                //vehicle.velocity = Vector(0.0, 0.0, -5.0)
+                //PlayersVelocities[plr] = 0.0
+                return true
+            }else{
+                println("STAIRS(MAYBE)")
+                return false
+            }
+
+        }
+
+        return false
+    }
     fun getplrVehicle(plr : Player): Entity? {
-        return plr.vehicle
+        return if (plr.isInsideVehicle){
+            plr.vehicle
+        }else{
+            null
+        }
+
     }
 
     fun GetVehicleWishDirection(frontandback : Double, sides : Double) : Vector? {

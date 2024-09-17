@@ -57,13 +57,15 @@ class Main : JavaPlugin() {
 
                 Bukkit.getOnlinePlayers().forEach {
                     val plr = it
+                    if (VehicleUtils.getplrVehicle(plr) == null) return
 
-                    //plr isn't accelerating
+                    //VehicleUtils.BounceBackIfWallAhead(plr)
+
+                    //plr deceleration
                     if (!VehicleUtils.PlayersAccelerating.contains(plr) && VehicleUtils.PlayersVelocities.get(plr) != 0.0) {
 
-                        if (VehicleUtils.PlayersVelocities.contains(plr)){
-                            VehicleUtils.DecreaseVel(plr)
-                        }
+                        //deceleration
+                        VehicleUtils.DecreaseVel(plr)
 
                     }
 
