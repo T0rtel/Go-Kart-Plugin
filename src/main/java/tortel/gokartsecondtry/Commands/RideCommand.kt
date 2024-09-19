@@ -19,6 +19,9 @@ class RideCommand : CommandExecutor {
         Vehicle.isInvisible = false
         Vehicle.isCustomNameVisible = false
         Vehicle.setAI(false)
+       // Vehicle.setBaby()
+        //Vehicle.isTamed = true
+        //Vehicle.owner = sender
 
         //make the player sit on armor stand
         Vehicle.addPassenger(sender)

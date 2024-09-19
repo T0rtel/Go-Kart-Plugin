@@ -2,6 +2,7 @@ package tortel.gokartsecondtry.Utils
 
 
 import org.bukkit.entity.Entity
+import org.bukkit.entity.Horse
 import org.bukkit.entity.Player
 import org.bukkit.util.Vector
 
@@ -18,7 +19,7 @@ object VehicleUtils {
     val bouncePower = -2.5
 
 
-    fun MoveForward(plr : Player){
+    fun MoveForward(plr: Player, frontAndBack: Float, sides: Float){
         if (!PlayersAccelerating.contains(plr)){
             PlayersAccelerating.add(plr)
         }
@@ -26,15 +27,10 @@ object VehicleUtils {
         val ArmorStand = getplrVehicle(plr)!! //TODO: IMPROVE
         val x = ArmorStand.location.direction.x
         val z = ArmorStand.location.direction.z
-        val bounce = BounceBackIfWallAhead(plr)
-        if (bounce){
-            ArmorStand.velocity =  Vector(x,0.0,z).multiply(Vector(bouncePower,-0.5,bouncePower))
-            PlayersAccelerating.remove(plr)
-            return
-        }
-        IncreaseVel(plr)
-        ArmorStand.velocity =  Vector(x,0.0,z).multiply(Vector(PlayersVelocities[plr]!!,-0.5,PlayersVelocities[plr]!!))
 
+        val bounce = BounceBackIfWallAhead(plr)
+        IncreaseVel(plr)
+        ArmorStand.velocity =  Vector(x,0.0,z).multiply(Vector(PlayersVelocities[plr]!!,-5.0,PlayersVelocities[plr]!!))
     }
 
     fun SteerRight(plr : Player){
@@ -88,14 +84,16 @@ object VehicleUtils {
         //println("${blockAhead.type}, $blockAboveBlockAhead")
 
         if (blockAhead.isCollidable && blockAhead.isSolid){
-
+            val x = vehicle.location.direction.x
+            val z = vehicle.location.direction.y
             if (blockAboveBlockAhead.isCollidable && blockAboveBlockAhead.isSolid){
-                println("HIT WALL")
-                //vehicle.velocity = Vector(0.0, 0.0, -5.0)
-                //PlayersVelocities[plr] = 0.0
+
+                vehicle.velocity =  Vector(x,0.0,z).multiply(Vector(bouncePower,-0.5,bouncePower))
+                PlayersAccelerating.remove(plr)
                 return true
             }else{
                 println("STAIRS(MAYBE)")
+
                 return false
             }
 
