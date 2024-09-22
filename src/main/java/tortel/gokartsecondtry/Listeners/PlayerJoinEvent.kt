@@ -9,5 +9,6 @@ class PlayerJoinEvent : Listener {
     @EventHandler
     fun onjoin(event : PlayerJoinEvent){
         VehicleUtils.PlayersVelocities.put(event.player, 0.0)
+        VehicleUtils.PlayerRotations.put(event.player, listOf(0.0,0.0))
     }
 }

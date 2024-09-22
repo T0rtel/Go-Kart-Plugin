@@ -1,8 +1,11 @@
 package tortel.gokartsecondtry.Utils
 
 
+import net.minecraft.world.entity.animal.horse.Horse
+import org.bukkit.Bukkit
+import org.bukkit.craftbukkit.entity.CraftEntity
+import org.bukkit.craftbukkit.entity.CraftHorse
 import org.bukkit.entity.Entity
-import org.bukkit.entity.Horse
 import org.bukkit.entity.Player
 import org.bukkit.util.Vector
 
@@ -11,6 +14,7 @@ object VehicleUtils {
 
     val PlayersAccelerating = mutableListOf<Player>()
     val PlayersVelocities = mutableMapOf<Player, Double>()
+    val PlayerRotations = mutableMapOf<Player, List<Double>>()
 
     val Acceleration = 0.01 //per tick
     val deceleration = 0.03
@@ -19,18 +23,20 @@ object VehicleUtils {
     val bouncePower = -2.5
 
 
+    //TODO: ADD NEW ROTATION VARIABLE, CHANGE FROM vehicle.velocity TO vehicle.setdeltaspeed or some shi
     fun MoveForward(plr: Player, frontAndBack: Float, sides: Float){
         if (!PlayersAccelerating.contains(plr)){
             PlayersAccelerating.add(plr)
         }
 
-        val ArmorStand = getplrVehicle(plr)!! //TODO: IMPROVE
-        val x = ArmorStand.location.direction.x
-        val z = ArmorStand.location.direction.z
+        val Vehicle = getplrVehicle(plr)!! //TODO: IMPROVE
+        val x = Vehicle.location.direction.x
+        val z = Vehicle.location.direction.z
 
         val bounce = BounceBackIfWallAhead(plr)
         IncreaseVel(plr)
-        ArmorStand.velocity =  Vector(x,0.0,z).multiply(Vector(PlayersVelocities[plr]!!,-5.0,PlayersVelocities[plr]!!))
+        Vehicle.velocity =  Vector(x,0.0,z).multiply(Vector(PlayersVelocities[plr]!!,0.0,PlayersVelocities[plr]!!))
+        //Vehicle.teleport(Vehicle.location.add(Vector(x,0.0,z).multiply(Vector(PlayersVelocities[plr]!!,-5.0,PlayersVelocities[plr]!!))))
     }
 //e
     fun SteerRight(plr : Player){
@@ -130,6 +136,14 @@ object VehicleUtils {
         }
 
         return
+    }
+
+    fun convertBukkitToNMS(entity: Entity): net.minecraft.world.entity.Entity {
+        return (entity as CraftEntity).handle
+    }
+
+    fun convertNMSToBukkit(nmsEntity: net.minecraft.world.entity.Entity): org.bukkit.entity.Entity {
+        return Bukkit.getEntity(nmsEntity.uuid)!!
     }
 
 }
