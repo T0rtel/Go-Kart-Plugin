@@ -1,21 +1,30 @@
 package tortel.gokartsecondtry.Commands
 
 
-import net.kyori.adventure.text.Component
-import net.minecraft.world.entity.Entity
+
+import net.minecraft.core.Vec3i
+import net.minecraft.references.Blocks
+import net.minecraft.world.entity.ai.goal.Goal
+import net.minecraft.world.entity.ai.goal.GoalSelector
 import net.minecraft.world.entity.animal.horse.Horse
+import net.minecraft.world.phys.Vec3
+import org.apache.logging.log4j.core.config.builder.api.Component
+import org.bukkit.Bukkit
+
 
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.craftbukkit.CraftWorld
-import org.bukkit.craftbukkit.entity.CraftEntity
+
 
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.entity.*
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.Vector
 import tortel.gokartsecondtry.Utils.VehicleUtils
+import tortel.gokartsecondtry.Utils.VehicleUtils.getMobPlayerIsRiding
+import tortel.gokartsecondtry.Utils.VehicleUtils.getplrVehicle
 
 
 class RideCommand : CommandExecutor {
@@ -24,12 +33,10 @@ class RideCommand : CommandExecutor {
         val plr = sender
         val craftPlayer = plr as CraftPlayer
         val player = craftPlayer.handle
-        val server = player.server
-        val level = player.level()
-        val serverlevel = player.serverLevel() // the world essentially
 
 
-        val Vehicle = sender.world.spawnEntity(sender.location, EntityType.ARMOR_STAND) as ArmorStand
+
+        val Vehicle = sender.world.spawnEntity(sender.location, EntityType.HORSE) as org.bukkit.entity.Horse
 
 
         Vehicle.isInvulnerable = true
@@ -38,16 +45,21 @@ class RideCommand : CommandExecutor {
         Vehicle.setNoPhysics(false)
         Vehicle.setGravity(true)
         //Vehicle.setAI(false)
-       // Vehicle.setBaby()
-        //Vehicle.isTamed = true
-        //Vehicle.owner = sender
+        Vehicle.setBaby()
+        Vehicle.isTamed = true
+        Vehicle.owner = sender
+        Vehicle.isSilent = true
 
         //make the player sit on armor stand
-        //Vehicle.addPassenger(sender)
+        Vehicle.addPassenger(sender)
 
-        Vehicle.customName(Component.text(sender.name))
+        Vehicle.customName(net.kyori.adventure.text.Component.text(plr.name))
+        getMobPlayerIsRiding(plr)!!.let { horse -> Bukkit.getMobGoals().removeAllGoals(horse)}
+
+
+
         //Vehicle.velocity = Vehicle.velocity.add(Vector(0.0,10.0,0.0))
-
+/*
 
         val Vehicleone = sender.world.spawnEntity(sender.location.add(Vector(0.0,0.0,3.0)), EntityType.HORSE) as org.bukkit.entity.Horse
 
@@ -67,7 +79,7 @@ class RideCommand : CommandExecutor {
         Vehicleone.velocity = Vehicleone.velocity.add(Vector(0.0,10.0,0.0))
         val nmsHorse = (Vehicleone as CraftEntity).handle
 
-        /*
+
                 val Vehicletwo = sender.world.spawnEntity(sender.location.add(Vector(0.0,0.0,6.0)), EntityType.HORSE) as org.bukkit.entity.Horse
 
                 Vehicletwo.isInvulnerable = true
@@ -115,7 +127,7 @@ class RideCommand : CommandExecutor {
                     //val npc = ServerEntity(serverlevel, EntityClass, 1, true)
                 }
 
-                 */
+
 
         fun spawnNMSHorse(): Horse {
             // Get the NMS world (WorldServer)
@@ -133,7 +145,7 @@ class RideCommand : CommandExecutor {
             //horse.isNoAi = true
 
 
-            horse.customName = net.minecraft.network.chat.Component.literal("NMS Horse")
+            horse.customName = net.minecraft.network.chat.Component.literal(plr.name)
 
             // Add the horse entity to the world
             nmsWorld.addFreshEntity(horse)
@@ -141,33 +153,54 @@ class RideCommand : CommandExecutor {
             return horse
 
         }
+        */
+
+        fun adjustForSlabs(horse: Horse) {
+            val blockInFront = horse.level().getBlockState(horse.blockPosition().offset(horse.lookAngle.x.toInt(), 0, horse.lookAngle.z.toInt()))
+
+            // Check if the block in front is a slab or stair
+            println("${horse.blockPosition().offset(Vec3i(horse.lookAngle.x.toInt(), 0 , horse.lookAngle.z.toInt()))}")
+            if (blockInFront.bukkitMaterial.name.lowercase().contains("slab")) {
+                // Apply a slight upward velocity
+                println("SLAB")
+                horse.setDeltaMovement(horse.deltaMovement.x, 0.5, horse.deltaMovement.z)
+            }
+        }
+
         fun moveHorse(horse: Horse) {
             // Set the horse's velocity based on the direction vector
             //horse.setDeltaMovement(direction.x, direction.y, direction.z)
+
             tortel.gokartsecondtry.Main.instance?.let {
                 object : BukkitRunnable() {
                     override fun run() {
-                        val direction = Vector(horse.direction.rotation.x.toDouble(), 0.0, horse.direction.rotation.z.toDouble()).multiply(Vector(
+                        val direction =
+                            Vector(VehicleUtils.PlayerRotations[plr]!!.first, 0.0, VehicleUtils.PlayerRotations[plr]!!.last).multiply(Vector(
                             VehicleUtils.PlayersVelocities[plr]!!,
                             0.0,
                             VehicleUtils.PlayersVelocities[plr]!!))
-                        horse.setDeltaMovement(direction.x, direction.y, direction.z)
+
+
+
+                    //adjustForSlabs(horse)
                     }
                 }.runTaskTimer(it, 1, 1)
             }
 
         }
 
-        val horse = spawnNMSHorse()
-        //horse.passengers.plus(plr)
-
+        //val horse = spawnNMSHorse()
+        /*
         player.startRiding(horse)
         horse.isTamed = true
         horse.ownerUUID = player.uuid
 
-        moveHorse(horse)
+         */
+
+        //moveHorse(horse)
 
 
         return false
     }
 }
+

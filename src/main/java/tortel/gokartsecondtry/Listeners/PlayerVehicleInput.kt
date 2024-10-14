@@ -53,7 +53,6 @@ class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(params().plugin(plugin
             }
 
         }
-
     }
 
 }

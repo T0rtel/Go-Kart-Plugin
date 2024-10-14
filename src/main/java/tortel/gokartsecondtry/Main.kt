@@ -3,7 +3,7 @@ package tortel.gokartsecondtry
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.ProtocolManager
 import org.bukkit.Bukkit
-import org.bukkit.entity.EntityType
+import org.bukkit.entity.Mob
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
@@ -61,6 +61,7 @@ class Main : JavaPlugin() {
                     if (VehicleUtils.getplrVehicle(plr) == null) return
 
                     //VehicleUtils.BounceBackIfWallAhead(plr)
+                    //VehicleUtils.getMobPlayerIsRiding(plr)!!.let { horse -> Bukkit.getMobGoals().removeAllGoals(horse) }
 
                     //plr deceleration
                     if (!VehicleUtils.PlayersAccelerating.contains(plr) && VehicleUtils.PlayersVelocities.get(plr)!! > 0.0) {

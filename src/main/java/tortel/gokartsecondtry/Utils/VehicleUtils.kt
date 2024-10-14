@@ -1,11 +1,15 @@
 package tortel.gokartsecondtry.Utils
 
 
-import net.minecraft.world.entity.animal.horse.Horse
+
+import net.minecraft.world.entity.MoverType
+import net.minecraft.world.phys.Vec3
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.entity.CraftEntity
-import org.bukkit.craftbukkit.entity.CraftHorse
+import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
 import org.bukkit.util.Vector
 
@@ -16,7 +20,7 @@ object VehicleUtils {
     val PlayersVelocities = mutableMapOf<Player, Double>()
     val PlayerRotations = mutableMapOf<Player, List<Double>>()
 
-    val Acceleration = 0.01 //per tick
+    val Acceleration = 0.1 //per tick
     val deceleration = 0.03
     val MaxSpeed = 1.0 // 1 * 20 = 20 blocks/second
     val MaxRotationSpeed = 10f
@@ -30,35 +34,54 @@ object VehicleUtils {
         }
 
         val Vehicle = getplrVehicle(plr)!! //TODO: IMPROVE
+        val nmsVehicle = convertBukkitToNMS(Vehicle)
         val x = Vehicle.location.direction.x
         val z = Vehicle.location.direction.z
 
-        val bounce = BounceBackIfWallAhead(plr)
+        //val bounce = BounceBackIfWallAhead(plr)
         IncreaseVel(plr)
-        Vehicle.velocity =  Vector(x,0.0,z).multiply(Vector(PlayersVelocities[plr]!!,0.0,PlayersVelocities[plr]!!))
+        //Vehicle.velocity =  Vector(x,0.0,z).multiply(Vector(PlayersVelocities[plr]!!,0.0,PlayersVelocities[plr]!!))
+
+        //Vehicle.setRotation(PlayerRotations[plr]!!.first.toFloat(), 0.0f)
+
+        //nmsVehicle.setDeltaMovement(Vec3(x,1.0,z).multiply(Vec3(PlayersVelocities[plr]!!,1.0,PlayersVelocities[plr]!!)))
         //Vehicle.teleport(Vehicle.location.add(Vector(x,0.0,z).multiply(Vector(PlayersVelocities[plr]!!,-5.0,PlayersVelocities[plr]!!))))
+        Vehicle.velocity =  Vector(Vehicle.location.direction.x,1.0,Vehicle.location.direction.z).multiply(Vector(PlayersVelocities[plr]!!,-5.0,PlayersVelocities[plr]!!))
     }
-//e
+
     fun SteerRight(plr : Player){
         val ArmorStand = getplrVehicle(plr)!!
 
-        if (PlayersAccelerating.contains(plr)){
-
+        if (PlayersVelocities[plr]!! > 0.0){//PlayersAccelerating.contains(plr)
+            val lastRot = PlayerRotations[plr]!!
             val RotationSpeed = MaxRotationSpeed
+            val newRot = lastRot.first + RotationSpeed
 
-            ArmorStand.setRotation(ArmorStand.yaw + RotationSpeed, 0.0f)
+            ArmorStand.setRotation(newRot.toFloat(), 0.0f)
+            PlayerRotations[plr] = listOf(newRot,0.0)
         }
 
     }
 
     fun SteerLeft(plr : Player){
         val ArmorStand = getplrVehicle(plr)!!
-
+        /*
         if (PlayersAccelerating.contains(plr)){
 
             val RotationSpeed = MaxRotationSpeed
 
             ArmorStand.setRotation(ArmorStand.yaw - RotationSpeed, 0.0f)
+        }
+
+         */
+
+        if (PlayersVelocities[plr]!! > 0.0){//PlayersAccelerating.contains(plr)
+            val lastRot = PlayerRotations[plr]!!
+            val RotationSpeed = MaxRotationSpeed
+            val newRot = lastRot.first - RotationSpeed
+
+            ArmorStand.setRotation(newRot.toFloat(), 0.0f)
+            PlayerRotations[plr] = listOf(newRot, 0.0)
         }
     }
 
@@ -76,7 +99,7 @@ object VehicleUtils {
         PlayersVelocities[plr]?.let { velocity ->
             if (velocity > 0) {
                 PlayersVelocities[plr] = (velocity - deceleration).coerceAtLeast(0.0)
-                getplrVehicle(plr)!!.velocity =  Vector(getplrVehicle(plr)!!.location.direction.x,0.0,getplrVehicle(plr)!!.location.direction.z).multiply(Vector(PlayersVelocities[plr]!!,-0.5,PlayersVelocities[plr]!!))
+                //getplrVehicle(plr)!!.velocity =  Vector(getplrVehicle(plr)!!.location.direction.x,0.0,getplrVehicle(plr)!!.location.direction.z).multiply(Vector(PlayersVelocities[plr]!!,-0.5,PlayersVelocities[plr]!!))
             }
         }
     }
@@ -98,7 +121,7 @@ object VehicleUtils {
                 PlayersAccelerating.remove(plr)
                 return true
             }else{
-                println("STAIRS(MAYBE)")
+               // println("STAIRS(MAYBE)")
 
                 return false
             }
@@ -144,6 +167,26 @@ object VehicleUtils {
 
     fun convertNMSToBukkit(nmsEntity: net.minecraft.world.entity.Entity): org.bukkit.entity.Entity {
         return Bukkit.getEntity(nmsEntity.uuid)!!
+    }
+
+    fun getMobPlayerIsRiding(plr: Player): Mob? {
+        // Get the player's vehicle (the entity they are riding)
+        val nmsPlayer = (plr as CraftPlayer).handle
+        val vehicle = nmsPlayer.vehicle
+
+        for (entity in plr.world.entities) {
+            if (entity is Mob && entity.name == plr.name){
+                //Bukkit.broadcastMessage("$entity")
+                return entity
+            }
+        }
+
+        return if (vehicle != null){
+            vehicle as Mob
+        }else{
+            null
+        }
+
     }
 
 }
