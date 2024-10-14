@@ -34,7 +34,7 @@ class RideCommand : CommandExecutor {
         val craftPlayer = plr as CraftPlayer
         val player = craftPlayer.handle
 
-        //TODO: ADD VEHICLE MODEL
+        //TODO: ADD VEHICLE MODELe
 
         val Vehicle = sender.world.spawnEntity(sender.location, EntityType.HORSE) as org.bukkit.entity.Horse
 
