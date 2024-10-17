@@ -2,12 +2,7 @@ package tortel.gokartsecondtry
 
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.ProtocolManager
-import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.EntityType
-import org.bukkit.entity.Mob
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
@@ -82,16 +77,16 @@ class Main : JavaPlugin() {
     fun setupTickSystem(){
         object : BukkitRunnable() {
             override fun run() {
-
+                /*
                 Bukkit.getOnlinePlayers().forEach {
                     val plr = it
                     if (VehicleUtils.getplrVehicle(plr) == null || VehicleUtils.PlayerHorses[plr] == null || VehicleUtils.PlayerArmorStands[plr] == null) return
 
                     //VehicleUtils.BounceBackIfWallAhead(plr)
                     //VehicleUtils.getMobPlayerIsRiding(plr)!!.let { horse -> Bukkit.getMobGoals().removeAllGoals(horse) }
-                    val Horse = VehicleUtils.PlayerHorses[plr]!!
-                    val ArmorStand = VehicleUtils.PlayerArmorStands[plr]!!
-                    val plrVRotation = VehicleUtils.PlayerRotations[plr]!!
+                    val Horse = VehicleUtils.PlayerHorses[plr] ?: return
+                    val ArmorStand = VehicleUtils.PlayerArmorStands[plr] ?: return
+                    val plrVRotation = VehicleUtils.PlayerRotations[plr] ?: return
                     //VELOCITY
                     Horse.velocity =  Vector(Horse.location.direction.x,0.5,Horse.location.direction.z).multiply( //TODO: HOVER CONSTANT for gliders
                         Vector(VehicleUtils.PlayersVelocities[plr]!!,-5.0, VehicleUtils.PlayersVelocities[plr]!!)
@@ -101,7 +96,9 @@ class Main : JavaPlugin() {
                     Horse.setRotation(plrVRotation.first, 0.0f)
 
                     //ARMOR STAND
+                    println("teleporting ArmorStand ${ArmorStand}")
                     ArmorStand.teleport(Horse)
+                    println("Teleported Armorstand to $Horse")
                     /*
                     val Atest = plr.world.spawnEntity(plr.location, EntityType.ARMOR_STAND) as ArmorStand
                     Atest.isInvulnerable = true
@@ -128,6 +125,42 @@ class Main : JavaPlugin() {
 
                     VehicleUtils.PlayersAccelerating.remove(plr)
                 }
+
+                 */
+                for (plr in Bukkit.getOnlinePlayers()) {
+                    if (VehicleUtils.getplrVehicle(plr) == null || VehicleUtils.PlayerHorses[plr] == null || VehicleUtils.PlayerArmorStands[plr] == null)
+                        continue
+
+                    val Horse = VehicleUtils.PlayerHorses[plr] ?: continue
+                    val ArmorStand = VehicleUtils.PlayerArmorStands[plr] ?: continue
+                    val plrVRotation = VehicleUtils.PlayerRotations[plr] ?: continue
+
+                    if (!Horse.isValid || !ArmorStand.isValid){
+                        println("WOOPSIES")
+                        continue
+                    }
+
+                    // VELOCITY
+                    Horse.velocity = Vector(Horse.location.direction.x, 0.5, Horse.location.direction.z).multiply(
+                        Vector(VehicleUtils.PlayersVelocities[plr]!!, -5.0, VehicleUtils.PlayersVelocities[plr]!!)
+                    )
+
+                    // ROTATION
+                    Horse.setRotation(plrVRotation.first, 0.0f)
+
+                    // ARMOR STAND
+                    ArmorStand.teleport(Horse)
+                    println("Teleported ArmorStand to Horse at: ${Horse.location}")
+
+                    // DECELERATION
+                    if (!VehicleUtils.PlayersAccelerating.contains(plr) && VehicleUtils.PlayersVelocities[plr]!! > 0.0) {
+                        println("Decelerate plr")
+                        VehicleUtils.DecreaseVel(plr)
+                    }
+
+                    VehicleUtils.PlayersAccelerating.remove(plr)
+                }
+
             }
         }.runTaskTimer(this, 1, 1)
 
