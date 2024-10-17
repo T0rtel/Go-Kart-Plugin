@@ -12,7 +12,6 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 
 
-import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.entity.*
 import tortel.gokartsecondtry.Utils.VehicleUtils.PlayerArmorStands
 import tortel.gokartsecondtry.Utils.VehicleUtils.PlayerHorses

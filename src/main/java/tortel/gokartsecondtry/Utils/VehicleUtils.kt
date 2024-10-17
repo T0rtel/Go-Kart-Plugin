@@ -2,15 +2,9 @@ package tortel.gokartsecondtry.Utils
 
 
 
-import net.minecraft.world.entity.MoverType
-import net.minecraft.world.phys.Vec3
 import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.craftbukkit.entity.CraftEntity
-import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Entity
-import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
@@ -161,19 +155,10 @@ object VehicleUtils {
     }
 
      */
-
-    fun convertBukkitToNMS(entity: Entity): net.minecraft.world.entity.Entity {
-        return (entity as CraftEntity).handle
-    }
-
-    fun convertNMSToBukkit(nmsEntity: net.minecraft.world.entity.Entity): org.bukkit.entity.Entity {
-        return Bukkit.getEntity(nmsEntity.uuid)!!
-    }
-
     fun getMobPlayerIsRiding(plr: Player): Mob? {
         // Get the player's vehicle (the entity they are riding)
-        val nmsPlayer = (plr as CraftPlayer).handle
-        val vehicle = nmsPlayer.vehicle
+       // val nmsPlayer = (plr as CraftPlayer).handle
+        val vehicle = plr.vehicle
 
         for (entity in plr.world.entities) {
             if (entity is Mob && entity.name == plr.name){
