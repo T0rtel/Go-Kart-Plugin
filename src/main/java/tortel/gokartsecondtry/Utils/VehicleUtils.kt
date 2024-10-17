@@ -5,25 +5,31 @@ package tortel.gokartsecondtry.Utils
 import net.minecraft.world.entity.MoverType
 import net.minecraft.world.phys.Vec3
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.craftbukkit.entity.CraftEntity
 import org.bukkit.craftbukkit.entity.CraftPlayer
+import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
 import org.bukkit.entity.Player
+import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.Vector
+import tortel.gokartsecondtry.Main
 
 
 object VehicleUtils {
 
     val PlayersAccelerating = mutableListOf<Player>()
     val PlayersVelocities = mutableMapOf<Player, Double>()
-    val PlayerRotations = mutableMapOf<Player, List<Double>>()
+    val PlayerRotations = mutableMapOf<Player, List<Float>>()
+    val PlayerHorses = mutableMapOf<Player, Entity>()
+    val PlayerArmorStands = mutableMapOf<Player, ArmorStand>()
 
-    val Acceleration = 0.1 //per tick
-    val deceleration = 0.03
+    val Acceleration = 0.05 //per tick
+    val deceleration = 0.1
     val MaxSpeed = 1.0 // 1 * 20 = 20 blocks/second
-    val MaxRotationSpeed = 10f
+    val MaxRotationSpeed = 7f
     val bouncePower = -2.5
 
 
@@ -34,19 +40,11 @@ object VehicleUtils {
         }
 
         val Vehicle = getplrVehicle(plr)!! //TODO: IMPROVE
-        val nmsVehicle = convertBukkitToNMS(Vehicle)
-        val x = Vehicle.location.direction.x
-        val z = Vehicle.location.direction.z
 
         //val bounce = BounceBackIfWallAhead(plr)
         IncreaseVel(plr)
-        //Vehicle.velocity =  Vector(x,0.0,z).multiply(Vector(PlayersVelocities[plr]!!,0.0,PlayersVelocities[plr]!!))
 
-        //Vehicle.setRotation(PlayerRotations[plr]!!.first.toFloat(), 0.0f)
-
-        //nmsVehicle.setDeltaMovement(Vec3(x,1.0,z).multiply(Vec3(PlayersVelocities[plr]!!,1.0,PlayersVelocities[plr]!!)))
-        //Vehicle.teleport(Vehicle.location.add(Vector(x,0.0,z).multiply(Vector(PlayersVelocities[plr]!!,-5.0,PlayersVelocities[plr]!!))))
-        Vehicle.velocity =  Vector(Vehicle.location.direction.x,1.0,Vehicle.location.direction.z).multiply(Vector(PlayersVelocities[plr]!!,-5.0,PlayersVelocities[plr]!!))
+        //Vehicle.velocity =  Vector(Vehicle.location.direction.x,1.0,Vehicle.location.direction.z).multiply(Vector(PlayersVelocities[plr]!!,-5.0,PlayersVelocities[plr]!!))
     }
 
     fun SteerRight(plr : Player){
@@ -57,8 +55,8 @@ object VehicleUtils {
             val RotationSpeed = MaxRotationSpeed
             val newRot = lastRot.first + RotationSpeed
 
-            ArmorStand.setRotation(newRot.toFloat(), 0.0f)
-            PlayerRotations[plr] = listOf(newRot,0.0)
+           // ArmorStand.setRotation(newRot.toFloat(), 0.0f)
+            PlayerRotations[plr] = listOf(newRot,0.0f)
         }
 
     }
@@ -80,8 +78,8 @@ object VehicleUtils {
             val RotationSpeed = MaxRotationSpeed
             val newRot = lastRot.first - RotationSpeed
 
-            ArmorStand.setRotation(newRot.toFloat(), 0.0f)
-            PlayerRotations[plr] = listOf(newRot, 0.0)
+            //ArmorStand.setRotation(newRot.toFloat(), 0.0f)
+            PlayerRotations[plr] = listOf(newRot, 0.0f)
         }
     }
 
@@ -146,6 +144,7 @@ object VehicleUtils {
         return Dir
     }
 
+    /*
     fun ApplyVelocity(plr : Player, frontAndBack : Double, sides :Double){
         if (frontAndBack == 0.0) return
         //val wishdir = GetVehicleWishDirection(frontAndBack, sides)!!
@@ -160,6 +159,8 @@ object VehicleUtils {
 
         return
     }
+
+     */
 
     fun convertBukkitToNMS(entity: Entity): net.minecraft.world.entity.Entity {
         return (entity as CraftEntity).handle
@@ -189,4 +190,30 @@ object VehicleUtils {
 
     }
 
+
+    fun setupSecondTickSystem(){
+        object : BukkitRunnable() {
+            override fun run() {
+
+                Bukkit.getOnlinePlayers().forEach {
+                    val plr = it
+                    if (VehicleUtils.getplrVehicle(plr) == null) return
+
+                    //VehicleUtils.BounceBackIfWallAhead(plr)
+                    //VehicleUtils.getMobPlayerIsRiding(plr)!!.let { horse -> Bukkit.getMobGoals().removeAllGoals(horse) }
+
+                    //plr deceleration
+                    if (!VehicleUtils.PlayersAccelerating.contains(plr) && VehicleUtils.PlayersVelocities.get(plr)!! > 0.0) {
+                        println("Decelerate plr")
+                        //deceleration
+                        VehicleUtils.DecreaseVel(plr)
+
+                    }
+
+                    VehicleUtils.PlayersAccelerating.remove(plr)
+                }
+            }
+        }.runTaskTimer(Main.instance!!, 1, 1)
+
+    }
 }

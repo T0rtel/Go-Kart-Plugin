@@ -2,61 +2,79 @@ package tortel.gokartsecondtry.Commands
 
 
 
-import net.minecraft.core.Vec3i
-import net.minecraft.references.Blocks
-import net.minecraft.world.entity.ai.goal.Goal
-import net.minecraft.world.entity.ai.goal.GoalSelector
-import net.minecraft.world.entity.animal.horse.Horse
-import net.minecraft.world.phys.Vec3
-import org.apache.logging.log4j.core.config.builder.api.Component
+import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
+import org.bukkit.Location
 
 
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
-import org.bukkit.craftbukkit.CraftWorld
 
 
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.entity.*
-import org.bukkit.scheduler.BukkitRunnable
-import org.bukkit.util.Vector
-import tortel.gokartsecondtry.Utils.VehicleUtils
+import tortel.gokartsecondtry.Utils.VehicleUtils.PlayerArmorStands
+import tortel.gokartsecondtry.Utils.VehicleUtils.PlayerHorses
 import tortel.gokartsecondtry.Utils.VehicleUtils.getMobPlayerIsRiding
-import tortel.gokartsecondtry.Utils.VehicleUtils.getplrVehicle
 
 
 class RideCommand : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, p2: String, args: Array<out String>?): Boolean {
         if (sender !is Player) return false
         val plr = sender
-        val craftPlayer = plr as CraftPlayer
-        val player = craftPlayer.handle
 
         //TODO: ADD VEHICLE MODEL
 
-        val Vehicle = sender.world.spawnEntity(sender.location, EntityType.HORSE) as org.bukkit.entity.Horse
+        val Horse = plr.world.spawnEntity(Location(plr.world,plr.location.x, plr.location.y, plr.location.z), EntityType.HORSE) as org.bukkit.entity.Horse
 
 
-        Vehicle.isInvulnerable = true
-        Vehicle.isInvisible = false
-        Vehicle.isCustomNameVisible = false
-        Vehicle.setNoPhysics(false)
-        Vehicle.setGravity(true)
+        Horse.isInvulnerable = true
+        Horse.isInvisible = false
+        Horse.isCustomNameVisible = false
+        Horse.setNoPhysics(false)
+        Horse.setGravity(true)
         //Vehicle.setAI(false)
-        Vehicle.setBaby()
-        Vehicle.isTamed = true
-        Vehicle.owner = sender
-        Vehicle.isSilent = true
+        //Horse.setBaby()
+        Horse.isTamed = true
+        Horse.owner = sender
+        Horse.isSilent = true
 
         //make the player sit on armor stand
-        Vehicle.addPassenger(sender)
+        //Vehicle.addPassenger(sender)
 
-        Vehicle.customName(net.kyori.adventure.text.Component.text(plr.name))
+        Horse.customName(Component.text(plr.name))
         getMobPlayerIsRiding(plr)!!.let { horse -> Bukkit.getMobGoals().removeAllGoals(horse)}
+        Horse.setRotation(0.0f,0.0f)
+
+        PlayerHorses[plr] = Horse
+
+        val ArmorStand = plr.world.spawnEntity(plr.location, EntityType.ARMOR_STAND) as ArmorStand
+        ArmorStand.isInvulnerable = true
+        ArmorStand.isInvisible = false
+        ArmorStand.isCustomNameVisible = false
+        ArmorStand.setGravity(false)
+        ArmorStand.isMarker = true
+        ArmorStand.isSilent = true
+        ArmorStand.isSmall = true
+
+        ArmorStand.addPassenger(plr)
+        //ArmorStand.customName(Component.text(plr.name))
+
+        /*
+        Atest.isInvulnerable = true
+                    Atest.isInvisible = false
+                    Atest.isCustomNameVisible = false
+                    Atest.setGravity(false)
+                    Atest.isMarker = true
+                    Atest.isSilent = true
+         */
 
 
+        PlayerArmorStands[plr] = ArmorStand
+
+        println(ArmorStand)
+        println(PlayerArmorStands[plr])
 
         //Vehicle.velocity = Vehicle.velocity.add(Vector(0.0,10.0,0.0))
 /*
@@ -154,7 +172,7 @@ class RideCommand : CommandExecutor {
 
         }
         */
-
+        /*
         fun adjustForSlabs(horse: Horse) {
             val blockInFront = horse.level().getBlockState(horse.blockPosition().offset(horse.lookAngle.x.toInt(), 0, horse.lookAngle.z.toInt()))
 
@@ -188,6 +206,8 @@ class RideCommand : CommandExecutor {
             }
 
         }
+
+         */
 
         //val horse = spawnNMSHorse()
         /*

@@ -27,7 +27,7 @@ class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(params().plugin(plugin
                 VehicleUtils.PlayersVelocities.put(plr, 0.0)
             }
             if (!VehicleUtils.PlayerRotations.contains(plr)){
-                VehicleUtils.PlayerRotations.put(plr, listOf(0.0,0.0))
+                VehicleUtils.PlayerRotations.put(plr, listOf(0.0f,0.0f))
             }
 
             val packet = event.packet
