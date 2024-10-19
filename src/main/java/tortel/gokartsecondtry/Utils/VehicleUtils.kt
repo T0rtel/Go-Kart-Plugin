@@ -2,11 +2,10 @@ package tortel.gokartsecondtry.Utils
 
 
 
+import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
-import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Mob
-import org.bukkit.entity.Player
+import org.bukkit.Location
+import org.bukkit.entity.*
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.Vector
 import tortel.gokartsecondtry.Main
@@ -139,23 +138,6 @@ object VehicleUtils {
         return Dir
     }
 
-    /*
-    fun ApplyVelocity(plr : Player, frontAndBack : Double, sides :Double){
-        if (frontAndBack == 0.0) return
-        //val wishdir = GetVehicleWishDirection(frontAndBack, sides)!!
-        // val vel = wishdir.add(Vector(0.0,0.0,0.01))
-        val ArmorStand = getplrVehicle(plr)
-
-        if (ArmorStand != null) {
-            ArmorStand.location.direction = Vector(sides,0.0,frontAndBack)
-            println(ArmorStand.location.direction)
-            println("${frontAndBack} AND $sides")
-        }
-
-        return
-    }
-
-     */
     fun getMobPlayerIsRiding(plr: Player): Mob? {
         // Get the player's vehicle (the entity they are riding)
        // val nmsPlayer = (plr as CraftPlayer).handle
@@ -176,30 +158,34 @@ object VehicleUtils {
 
     }
 
+    fun spawnHorse(worldname : String, plr : Player){
+        val Horse = Bukkit.getWorld(worldname)!!.spawnEntity(Location(plr.world,plr.location.x, plr.location.y, plr.location.z), EntityType.HORSE) as org.bukkit.entity.Horse
 
-    fun setupSecondTickSystem(){
-        object : BukkitRunnable() {
-            override fun run() {
 
-                Bukkit.getOnlinePlayers().forEach {
-                    val plr = it
-                    if (VehicleUtils.getplrVehicle(plr) == null) return
+        Horse.isInvulnerable = true
+        Horse.isInvisible = false
+        Horse.isCustomNameVisible = false
+        Horse.setNoPhysics(false)
+        Horse.setGravity(true)
+        //Vehicle.setAI(false)
+        //Horse.setBaby()
+        Horse.isTamed = true
+        Horse.owner = plr
+        Horse.isSilent = true
 
-                    //VehicleUtils.BounceBackIfWallAhead(plr)
-                    //VehicleUtils.getMobPlayerIsRiding(plr)!!.let { horse -> Bukkit.getMobGoals().removeAllGoals(horse) }
+        //make the player sit on armor stand
+        //Vehicle.addPassenger(sender)
 
-                    //plr deceleration
-                    if (!VehicleUtils.PlayersAccelerating.contains(plr) && VehicleUtils.PlayersVelocities.get(plr)!! > 0.0) {
-                        println("Decelerate plr")
-                        //deceleration
-                        VehicleUtils.DecreaseVel(plr)
+        Horse.customName(Component.text(plr.name))
+        getMobPlayerIsRiding(plr)!!.let { horse -> Bukkit.getMobGoals().removeAllGoals(horse)}
+        Horse.setRotation(0.0f,0.0f)
 
-                    }
+        PlayerHorses[plr] = Horse
+    }
 
-                    VehicleUtils.PlayersAccelerating.remove(plr)
-                }
-            }
-        }.runTaskTimer(Main.instance!!, 1, 1)
+    fun spawnArmorStand(worldname : String,plr : Player){
+        val ArmorStand = Bukkit.getWorld(worldname)!!.spawnEntity(Location(plr.world,plr.location.x, plr.location.y, plr.location.z), EntityType.HORSE) as ArmorStand
 
+        PlayerArmorStands[plr] = ArmorStand
     }
 }

@@ -5,7 +5,7 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import tortel.gokartsecondtry.Race.RaceUtils
+import tortel.gokartsecondtry.Utils.RaceUtils
 
 
 class RaceCommand : CommandExecutor {
