@@ -7,6 +7,7 @@ import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.Vector
+import tortel.gokartsecondtry.Commands.RaceCommand
 import tortel.gokartsecondtry.Commands.RideCommand
 import tortel.gokartsecondtry.Listeners.PlayerJoinEvent
 import tortel.gokartsecondtry.Listeners.PlayerSpaceHeld
@@ -51,6 +52,7 @@ class Main : JavaPlugin() {
 
     fun registerCommands(){
         getCommand("ride")?.setExecutor(RideCommand())
+        getCommand("race")?.setExecutor(RaceCommand())
     }
 
     fun onDisablelogic(){
@@ -149,7 +151,10 @@ class Main : JavaPlugin() {
                     Horse.setRotation(plrVRotation.first, 0.0f)
 
                     // ARMOR STAND
-                    ArmorStand.teleport(Horse)
+                    if (plr.vehicle != null){
+                        plr.vehicle!!.teleport(Horse)
+                    }
+
                     println("Teleported ArmorStand to Horse at: ${Horse.location}")
 
                     // DECELERATION

@@ -37,6 +37,7 @@ object VehicleUtils {
 
         //val bounce = BounceBackIfWallAhead(plr)
         IncreaseVel(plr)
+        Vehicle.teleport(PlayerHorses[plr]!!)
 
         //Vehicle.velocity =  Vector(Vehicle.location.direction.x,1.0,Vehicle.location.direction.z).multiply(Vector(PlayersVelocities[plr]!!,-5.0,PlayersVelocities[plr]!!))
     }

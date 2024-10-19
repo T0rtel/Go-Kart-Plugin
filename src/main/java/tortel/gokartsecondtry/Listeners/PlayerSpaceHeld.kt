@@ -8,7 +8,7 @@ import org.bukkit.event.Listener
 class PlayerSpaceHeld() : Listener {
     @EventHandler
     fun onjump(event : PlayerJumpEvent){
-        println("${event.player} JUMPED!")
+       // println("${event.player} JUMPED!")
     }
 }
 /*

@@ -49,16 +49,16 @@ class RideCommand : CommandExecutor {
         PlayerHorses[plr] = Horse
 
         val ArmorStand = plr.world.spawnEntity(plr.location, EntityType.ARMOR_STAND) as ArmorStand
-        ArmorStand.isInvulnerable = true
-        ArmorStand.isInvisible = false
-        ArmorStand.isCustomNameVisible = false
-        ArmorStand.setGravity(false)
+        //ArmorStand.isInvulnerable = true
+        // ArmorStand.isInvisible = false
+        // ArmorStand.isCustomNameVisible = false
+        // ArmorStand.setGravity(false)
         //ArmorStand.isMarker = true
-        ArmorStand.isSilent = true
-        ArmorStand.isSmall = true
+       // ArmorStand.isSilent = true
+        // ArmorStand.isSmall = true
 
-        ArmorStand.addPassenger(plr)
-        ArmorStand.customName(Component.text(plr.name))
+         ArmorStand.addPassenger(plr)
+        // ArmorStand.customName(Component.text(plr.name))
 
         /*
         Atest.isInvulnerable = true
