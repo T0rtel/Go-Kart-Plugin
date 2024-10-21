@@ -3,16 +3,16 @@ package tortel.gokartsecondtry
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.ProtocolManager
 import org.bukkit.Bukkit
+import org.bukkit.entity.ArmorStand
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.Vector
 import tortel.gokartsecondtry.Commands.RaceCommand
 import tortel.gokartsecondtry.Commands.RideCommand
-import tortel.gokartsecondtry.Listeners.PlayerJoinEvent
-import tortel.gokartsecondtry.Listeners.PlayerSpaceHeld
-import tortel.gokartsecondtry.Listeners.PlayerVehicleInput
-import tortel.gokartsecondtry.Listeners.UnHeldKeyEvent
+import tortel.gokartsecondtry.Listeners.*
+import tortel.gokartsecondtry.Utils.RaceUtils
+import tortel.gokartsecondtry.Utils.RaceUtils.playersInRace
 import tortel.gokartsecondtry.Utils.VehicleUtils
 import java.io.File
 
@@ -33,13 +33,14 @@ class Main : JavaPlugin() {
 
         registerEvents()
         registerCommands()
-        setupTickSystem()
+        //setupTickSystem()
         logger.info("GoKart Plugin Enabled!")
     }
 
     override fun onDisable() {
         // Plugin shutdown logic
         onDisablelogic()
+        RaceUtils.stopRace("whateva")
     }
 
     fun registerEvents(){
@@ -47,6 +48,7 @@ class Main : JavaPlugin() {
         protocolManager!!.addPacketListener(UnHeldKeyEvent(this))
         pluginmanager.registerEvents(PlayerJoinEvent(), this)
         pluginmanager.registerEvents(PlayerSpaceHeld(), this)
+        pluginmanager.registerEvents(PlayerQuitVehicle(), this)
 
     }
 
@@ -79,57 +81,8 @@ class Main : JavaPlugin() {
     fun setupTickSystem(){
         object : BukkitRunnable() {
             override fun run() {
-                /*
-                Bukkit.getOnlinePlayers().forEach {
-                    val plr = it
-                    if (VehicleUtils.getplrVehicle(plr) == null || VehicleUtils.PlayerHorses[plr] == null || VehicleUtils.PlayerArmorStands[plr] == null) return
-
-                    //VehicleUtils.BounceBackIfWallAhead(plr)
-                    //VehicleUtils.getMobPlayerIsRiding(plr)!!.let { horse -> Bukkit.getMobGoals().removeAllGoals(horse) }
-                    val Horse = VehicleUtils.PlayerHorses[plr] ?: return
-                    val ArmorStand = VehicleUtils.PlayerArmorStands[plr] ?: return
-                    val plrVRotation = VehicleUtils.PlayerRotations[plr] ?: return
-                    //VELOCITY
-                    Horse.velocity =  Vector(Horse.location.direction.x,0.5,Horse.location.direction.z).multiply( //TODO: HOVER CONSTANT for gliders
-                        Vector(VehicleUtils.PlayersVelocities[plr]!!,-5.0, VehicleUtils.PlayersVelocities[plr]!!)
-                    )
-
-                    //ROTATION
-                    Horse.setRotation(plrVRotation.first, 0.0f)
-
-                    //ARMOR STAND
-                    println("teleporting ArmorStand ${ArmorStand}")
-                    ArmorStand.teleport(Horse)
-                    println("Teleported Armorstand to $Horse")
-                    /*
-                    val Atest = plr.world.spawnEntity(plr.location, EntityType.ARMOR_STAND) as ArmorStand
-                    Atest.isInvulnerable = true
-                    Atest.isInvisible = false
-                    Atest.isCustomNameVisible = false
-                    Atest.setGravity(false)
-                    Atest.isMarker = true
-                    Atest.isSilent = true
-                    Atest.isSmall = true
-
-                     */
-
-                    //Atest.teleport(Horse)
-
-
-
-                    //DECELERATION
-                    if (!VehicleUtils.PlayersAccelerating.contains(plr) && VehicleUtils.PlayersVelocities.get(plr)!! > 0.0) {
-                        println("Decelerate plr")
-                        //deceleration
-                        VehicleUtils.DecreaseVel(plr)
-
-                    }
-
-                    VehicleUtils.PlayersAccelerating.remove(plr)
-                }
-
-                 */
-                for (plr in Bukkit.getOnlinePlayers()) {
+               if (!RaceUtils.RaceStarted) return
+                for (plr in playersInRace) {
                     if (VehicleUtils.getplrVehicle(plr) == null || VehicleUtils.PlayerHorses[plr] == null || VehicleUtils.PlayerArmorStands[plr] == null)
                         continue
 
@@ -148,18 +101,16 @@ class Main : JavaPlugin() {
                     )
 
                     // ROTATION
-                    Horse.setRotation(plrVRotation.first, 0.0f)
+                    Horse.setRotation(plrVRotation, 0.0f)
 
                     // ARMOR STAND
-                    if (plr.vehicle != null){
-                        plr.vehicle!!.teleport(Horse)
-                    }
+                    ArmorStand.teleport(Horse)
 
-                    println("Teleported ArmorStand to Horse at: ${Horse.location}")
+                    //println("Teleported ArmorStand to Horse at: ${Horse.location}")
 
                     // DECELERATION
                     if (!VehicleUtils.PlayersAccelerating.contains(plr) && VehicleUtils.PlayersVelocities[plr]!! > 0.0) {
-                        println("Decelerate plr")
+                        //println("Decelerate plr")
                         VehicleUtils.DecreaseVel(plr)
                     }
 

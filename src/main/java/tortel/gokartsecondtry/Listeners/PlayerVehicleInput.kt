@@ -27,7 +27,8 @@ class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(params().plugin(plugin
                 VehicleUtils.PlayersVelocities.put(plr, 0.0)
             }
             if (!VehicleUtils.PlayerRotations.contains(plr)){
-                VehicleUtils.PlayerRotations.put(plr, listOf(0.0f,0.0f))
+                VehicleUtils.PlayerRotations.put(plr, 0.0f)
+                println(VehicleUtils.PlayerRotations)
             }
 
             val packet = event.packet
@@ -38,7 +39,7 @@ class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(params().plugin(plugin
             //VehicleUtils.ApplyVelocity(plr, frontAndBack.toDouble(), sides.toDouble())
             if (frontAndBack == 0.98f){
                // println("W")
-                VehicleUtils.MoveForward(plr, frontAndBack, sides)
+                VehicleUtils.MoveForward(plr)
             }
             if (frontAndBack == -0.98f){
                // println("S")
