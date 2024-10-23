@@ -43,6 +43,7 @@ class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(params().plugin(plugin
             }
             if (frontAndBack == -0.98f){
                // println("S")
+                VehicleUtils.drift(plr, sides)
 
             }
             if (sides == 0.98f){

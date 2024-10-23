@@ -1,15 +1,12 @@
 package tortel.gokartsecondtry.Utils
 
 
-
+import com.comphenix.protocol.PacketType.Play
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.attribute.Attribute
 import org.bukkit.entity.*
-import org.bukkit.entity.ItemDisplay.ItemDisplayTransform
-import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.Transformation
@@ -19,6 +16,8 @@ import org.joml.Vector3f
 import tortel.gokartsecondtry.Main
 import tortel.gokartsecondtry.Utils.RaceUtils.RaceStarted
 import tortel.gokartsecondtry.Utils.RaceUtils.playersInRace
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 object VehicleUtils {
@@ -28,13 +27,22 @@ object VehicleUtils {
     val PlayerRotations = mutableMapOf<Player, Float>()
     val PlayerHorses = mutableMapOf<Player, Entity>()
     val PlayerArmorStands = mutableMapOf<Player, Entity>()
+    val PlayersDrifting = mutableListOf<Player>()
+    val DriftingDir = mutableMapOf<Player, String>()
+    val PlayersTickDrifting = mutableMapOf<Player, Int>()
 
+    //driving
     val Acceleration = 0.05 //per tick
-    val deceleration = 0.1
-    val MaxSpeed = 1.0 // 1 * 20 = 20 blocks/second
-    val MaxRotationSpeed = 5f
+    val deceleration = 0.01
+    val MaxSpeed = 0.8 // 0.8 * 20 = 16 blocks/second
+    val MaxRotationSpeed = 2f
     val bouncePower = -2.5
 
+    //drifting
+    val DriftingStartOffset = 15f // when we start drifting, rotate this much to start drifting
+    val MaxDriftingRotationSpeed = 5f
+    val MinDriftingRotationSpeed = 3f
+    val MaxDriftingSpeed = 0.5
 
     //TODO: ADD NEW ROTATION VARIABLE, CHANGE FROM vehicle.velocity TO vehicle.setdeltaspeed or some shi
     fun MoveForward(plr: Player){
@@ -53,8 +61,7 @@ object VehicleUtils {
 
     fun SteerRight(plr : Player){
 
-
-        if (PlayersVelocities[plr]!! > 0.0){//PlayersAccelerating.contains(plr)
+        if (PlayersVelocities[plr]!! > 0.0 && !PlayersDrifting.contains(plr)){//PlayersAccelerating.contains(plr)
             val lastRot = PlayerRotations[plr]!!
             val RotationSpeed = MaxRotationSpeed
             val newRot = lastRot + RotationSpeed
@@ -67,17 +74,7 @@ object VehicleUtils {
 
     fun SteerLeft(plr : Player){
 
-        /*
-        if (PlayersAccelerating.contains(plr)){
-
-            val RotationSpeed = MaxRotationSpeed
-
-            ArmorStand.setRotation(ArmorStand.yaw - RotationSpeed, 0.0f)
-        }
-
-         */
-
-        if (PlayersVelocities[plr]!! > 0.0){//PlayersAccelerating.contains(plr)
+        if (PlayersVelocities[plr]!! > 0.0 && !PlayersDrifting.contains(plr)){//PlayersAccelerating.contains(plr)
             val lastRot = PlayerRotations[plr]!!
             val RotationSpeed = MaxRotationSpeed
             val newRot = lastRot - RotationSpeed
@@ -86,6 +83,80 @@ object VehicleUtils {
             PlayerRotations[plr] = newRot
         }
     }
+
+    fun drift(plr : Player, sides: Float){
+        //TODO: add on drift offset and a bit of a jump (when we start give the player the bump,
+        // dont give him a bump till he stops drifting then remove his tag or smth)
+        if (PlayersDrifting.contains(plr) || sides == 0f) return
+        PlayersDrifting.add(plr)
+        var isfirstTick = false
+        var lastRot = PlayerRotations[plr]!!
+
+        if (!PlayersTickDrifting.contains(plr)){
+            PlayersTickDrifting[plr] = 0
+        }
+
+        //drifting first tick(fired when he starts drifting)
+        if (PlayersTickDrifting[plr] == 0){
+            PlayersTickDrifting[plr] = 1
+            //do first tick stuff
+            isfirstTick = true
+            println("just started drifting")
+
+            if (sides == -0.98f){
+                DriftingDir[plr] = "left"
+
+                PlayerRotations[plr] = lastRot + DriftingStartOffset
+                lastRot += DriftingStartOffset
+
+                //PlayerRotations[plr] = PlayerRotations[plr]!! + MaxDriftingRotationSpeed
+            }
+            if (sides == 0.98f){
+                DriftingDir[plr] = "right"
+
+                PlayerRotations[plr] = lastRot - DriftingStartOffset
+                lastRot -= DriftingStartOffset
+
+                //PlayerRotations[plr] = PlayerRotations[plr]!! - MaxDriftingRotationSpeed
+            }
+        }
+
+        if (DriftingDir[plr] == "left"){ // originally going left
+            if (sides == -0.98f){ // is still going left, angle stays the same, increased
+
+                PlayerRotations[plr] = lastRot + MaxDriftingRotationSpeed
+            }
+            if (sides == 0.98f){ // BUT if its going right (originally left) angle decreases
+
+                PlayerRotations[plr] = lastRot - MinDriftingRotationSpeed
+            }
+        }
+
+        if (DriftingDir[plr] == "right"){ // originally going right
+            if (sides == 0.98f){ // is still going right, angle stays the same, increased
+
+                PlayerRotations[plr] = lastRot + MaxDriftingRotationSpeed
+            }
+            if (sides == -0.98f){ // UT if its going left (originally left) angle decreases
+
+                PlayerRotations[plr] = lastRot + MinDriftingRotationSpeed
+            }
+        }
+        /*
+        if (sides == -0.98f){
+            DriftingDir[plr] = "left"
+
+            PlayerRotations[plr] = lastRot + MaxDriftingRotationSpeed
+        }
+        if (sides == 0.98f){
+            DriftingDir[plr] = "right"
+
+            PlayerRotations[plr] = lastRot - MaxDriftingRotationSpeed
+        }
+
+         */
+    }
+
 
     fun IncreaseVel(plr : Player){
         PlayersVelocities[plr]?.let { velocity ->
@@ -169,13 +240,13 @@ object VehicleUtils {
     }
 
 
-    /*
+
     fun spawnHorse(worldname : String, plr : Player){
         val Horse = Bukkit.getWorld(worldname)!!.spawnEntity(Location(plr.world,plr.location.x, plr.location.y, plr.location.z), EntityType.HORSE) as Horse
 
 
         Horse.isInvulnerable = true
-       // Horse.isInvisible = true
+        Horse.isInvisible = true
         Horse.isCustomNameVisible = false
         Horse.setNoPhysics(false)
         Horse.setGravity(true)
@@ -189,155 +260,13 @@ object VehicleUtils {
         Horse.customName(Component.text(plr.name))
         //Horse.let { horse -> Bukkit.getMobGoals().removeAllGoals(horse)}
         Bukkit.getMobGoals().removeAllGoals(Horse)
-        Horse.setRotation(0.0f,0.0f)
+        Horse.setRotation(plr.location.yaw,0.0f)
 
-       // Horse.addPassenger(plr)
+        //Horse.addPassenger(plr)
         PlayerHorses[plr] = Horse
     }
 
-     */
-    /*
-    fun spawnHorse(worldname: String, plr:Player){
-        val location = Location(Bukkit.getWorld(worldname),plr.location.x, plr.location.y, plr.location.z)
-        val horse: Horse = location.world?.spawnEntity(location, EntityType.HORSE) as Horse
-        horse.isTamed = true
-        horse.isSilent = true
-        horse.isInvulnerable = true
-        horse.age = -1000000 // Set the age
 
-        // Set horse attributes
-        horse.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)?.baseValue = 0.0
-
-        // Create the first snowball passenger
-        val snowball1: Snowball = location.world?.spawnEntity(location, EntityType.SNOWBALL) as Snowball
-        val itemStack1 = ItemStack(Material.GUNPOWDER, 1)
-        val meta1 = itemStack1.itemMeta
-        meta1?.setCustomModelData(1) // Set CustomModelData
-        itemStack1.itemMeta = meta1
-        snowball1.setItem(itemStack1) // Set the item for the snowball
-        snowball1.addPassenger(horse) // Add snowball as passenger of the horse
-
-        // Create the second snowball passenger
-        val snowball2: Snowball = location.world?.spawnEntity(location, EntityType.SNOWBALL) as Snowball
-        val itemStack2 = ItemStack(Material.GUNPOWDER, 1)
-        val meta2 = itemStack2.itemMeta
-        meta2?.setCustomModelData(1) // Set CustomModelData
-        itemStack2.itemMeta = meta2
-        snowball2.setItem(itemStack2) // Set the item for the snowball
-        snowball1.addPassenger(snowball2) // Add the second snowball as passenger of the first snowball
-
-        // Finally, add the first snowball as a passenger of the horse
-        horse.addPassenger(snowball1)
-
-        Bukkit.getMobGoals().removeAllGoals(horse)
-        PlayerHorses[plr] = horse
-    }
-
-
-
-     */
-
-
-    fun spawnHorse(worldname : String, plr : Player){
-        val Pig = Bukkit.getWorld(worldname)!!.spawnEntity(Location(plr.world,plr.location.x, plr.location.y, plr.location.z), EntityType.PIG) as Pig
-        Pig.isInvulnerable = true
-        Pig.isInvisible = true
-        Pig.setBaby()
-        Pig.isSilent = true
-
-        val Item = ItemStack(Material.YELLOW_DYE)
-        val meta = Item.itemMeta
-        meta.setCustomModelData(1)
-        Item.setItemMeta(meta)
-
-        Bukkit.getMobGoals().removeAllGoals(Pig)
-
-        //ArmorStand.setItem(EquipmentSlot.HEAD, Item)
-
-        //ArmorStand.setItemStack(ItemStack(Material.PAPER))
-        //ArmorStand.setCanMove(true)
-
-        //ArmorStand.teleport(Location(ArmorStand.world, ArmorStand.location.x,ArmorStand.location.y + 50,ArmorStand.location.z))
-
-        Pig.addPassenger(plr)
-        PlayerHorses[plr] = Pig
-    }
-
-
-    /*
-    fun spawnAreaEffectCloud(worldname: String, plr : Player){
-        val location = Location(Bukkit.getWorld(worldname),plr.location.x, plr.location.y, plr.location.z)
-        val areaEffectCloud = location.world!!.spawn(location, AreaEffectCloud::class.java).apply {
-            radius = 0.0f
-            duration = 1000000000
-        }
-
-        // Create item displays (use ItemFrame for simplicity)
-        val item1 = spawnCustomItemDisplay(location, Material.YELLOW_DYE, 1).apply {
-            transformation = Transformation(
-                Vector3f(0.0f, 0.5f, 0.0f),
-                AxisAngle4f(0.0f,0.0f,0.0f,1.0f),
-                Vector3f(2f, 2f, 2f),
-                AxisAngle4f(0.0f, 0.0f, 0.0f, 1.0f)
-            )
-        }
-
-        val item2 = spawnCustomItemDisplay(location, Material.YELLOW_DYE, 150, true).apply {
-            transformation = Transformation(
-                Vector3f(0.0f, 0.5f, 0.0f),
-                AxisAngle4f(0.0f,0.0f,0.0f,1.0f),
-                Vector3f(2f, 2f, 2f),
-                AxisAngle4f(0.0f, 0.0f, 0.0f, 1.0f)
-            )
-        }  // glider (invisible)
-        val item3 = spawnCustomItemDisplay(location, Material.YELLOW_DYE, 100).apply {
-            transformation = Transformation(
-                Vector3f(0.0f, 0.5f, 0.0f),
-                AxisAngle4f(0.0f,0.0f,0.0f,1.0f),
-                Vector3f(2f, 2f, 2f),
-                AxisAngle4f(0.0f, 0.0f, 0.0f, 1.0f)
-            )
-        }  // item attachment
-
-        // Summon the pig (which the player will ride)
-        val pig = spawnPigWithProperties(location)
-
-        // Set passengers: pig is the last passenger, and the AreaEffectCloud is at the base
-
-        pig.addPassenger(plr)  // Attach item3 to pig
-        item1.addPassenger(item2)
-        item1.addPassenger(item3)  // Attach item2 to item3
-        item1.addPassenger(pig)  // Attach item1 to item2
-        areaEffectCloud.addPassenger(item1)  // Attach everything to AreaEffectCloud
-
-        PlayerArmorStands[plr] = item1
-    }
-
-
-
-    private fun spawnCustomItemDisplay(location: Location, material: Material, customModelData: Int, invisible: Boolean = false): ItemDisplay {
-        val itemDisplay = location.world!!.spawn(location, ItemDisplay::class.java).apply {
-            setItemStack(ItemStack(material).apply {
-                itemMeta = itemMeta!!.apply {
-                    setCustomModelData(customModelData)
-                }
-            })
-            //isVisible = !invisible  // Set visibility based on 'invisible' flag
-        }
-        return itemDisplay
-    }
-
-    // Helper to spawn and customize a pig
-    private fun spawnPigWithProperties(location: Location): Pig {
-        return location.world!!.spawn(location, Pig::class.java).apply {
-            isSilent = true
-            isInvulnerable = true
-            setAI(false)
-            addPotionEffect(org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.INVISIBILITY, Int.MAX_VALUE, 1, false, false))
-            setBaby()
-        }
-    }
-*/
 
     fun spawnArmorStand(worldname: String, plr : Player){
         val ArmorStand = Bukkit.getWorld(worldname)!!.spawnEntity(Location(plr.world,plr.location.x, plr.location.y, plr.location.z), EntityType.ITEM_DISPLAY) as ItemDisplay
@@ -345,6 +274,16 @@ object VehicleUtils {
 
         ArmorStand.setNoPhysics(true)
         ArmorStand.setGravity(false)
+        ArmorStand.teleportDuration = 1
+
+        ArmorStand.transformation = Transformation(
+            Vector3f(0.0f, 0.5f, 0.0f),
+            AxisAngle4f(0.0f,0.0f,0.0f,1.0f),
+            Vector3f(-2f, 2f, -2f), // was originally 2f,2f,2f
+            AxisAngle4f(0.0f, 0.0f, 0.0f, 1.0f)
+        )
+
+
         //ArmorStand.isOp = true
         //ArmorStand.isMarker = true
         //ArmorStand.isSmall = true
@@ -363,8 +302,12 @@ object VehicleUtils {
        // ArmorStand.addPassenger(plr)
         //ArmorStand.setItem(EquipmentSlot.HEAD, Item)
 
-        //ArmorStand.addPassenger(plr
+        //ArmorStand.addPassenger(plr)
+
+        ArmorStand.addPassenger(plr)
         PlayerArmorStands[plr] = ArmorStand
+
+        PlayerHorses[plr]!!.addPassenger(ArmorStand)
     }
 
 
@@ -405,34 +348,59 @@ object VehicleUtils {
 
                     val Velocity = PlayersVelocities[plr] ?: continue
 
+                    println("$PlayersDrifting $DriftingDir")
+
+                    val forwardSpeed = 1 // Increased forward speed
+                    val diagonalOffset = 0.3 // Decreased rightward offset
+
+                    val radians = Math.toRadians(Horse.location.yaw.toDouble())
+
+                    val leftdriftingx = -sin(radians) * forwardSpeed + cos(radians) * diagonalOffset
+                    val leftdriftingz = cos(radians) * forwardSpeed + sin(radians) * diagonalOffset
+
+                    val rightdriftingx = -sin(radians) * forwardSpeed  - cos(radians)* diagonalOffset
+                    val rightdriftingz = cos(radians) * forwardSpeed - sin(radians)* diagonalOffset
+
 
 
                     // VELOCITY
-                    Horse.velocity = Vector(Horse.location.direction.x, 0.5, Horse.location.direction.z).multiply(
-                        Vector(Velocity, -5.0, Velocity)
-                    )
+                    if (PlayersDrifting.contains(plr) && Velocity > (Velocity * 20/100)){
+                        if (DriftingDir[plr] == "left") {
+                            Horse.velocity = Vector(leftdriftingx, 0.5, leftdriftingz).multiply(
+                                Vector(Velocity, -5.0, Velocity)
+                            )
+                        }else if (DriftingDir[plr] == "right") {
+                            Horse.velocity = Vector(rightdriftingx, 0.5, rightdriftingz).multiply(
+                                Vector(Velocity, -5.0, Velocity)
+                            )
+                        }
+
+                    }else{
+                        Horse.velocity = Vector(Horse.location.direction.x, 0.5, Horse.location.direction.z).multiply(
+                            Vector(Velocity, -5.0, Velocity)
+                        )
+
+                    }
 
                     // ROTATION
                     Horse.setRotation(plryawRotation, 0.0f)
-
-                    // ARMOR STAND
-                   // ArmorStand.removePassenger(plr)
-                    //plr.teleport(ArmorStand)
-                    ArmorStand.teleport(Horse.location.add(0.0,0.0,0.0)) // -1.7
-                   // ArmorStand.addPassenger(plr)
-
-                    //ArmorStand.teleport(Location(ArmorStand.world, ArmorStand.location.x,ArmorStand.location.y + 1,ArmorStand.location.z))
-                    //println("Teleported ArmorStand to Horse at: ${Horse.location}")
+                    ArmorStand.setRotation(plryawRotation, 0.0f)
 
                     // DECELERATION
-                    if (!PlayersAccelerating.contains(plr) && PlayersVelocities[plr]!! > 0.0) {
+                    if (!PlayersAccelerating.contains(plr) && PlayersVelocities[plr]!! > 0.0 && !PlayersDrifting.contains(plr)) {
                         //println("Decelerate plr")
                         DecreaseVel(plr)
+
+                    }
+
+                    if (!PlayersDrifting.contains(plr)){
+                        PlayersTickDrifting[plr] = 0
                     }
 
                     PlayersAccelerating.remove(plr)
+                    PlayersDrifting.remove(plr)
+                    DriftingDir.remove(plr)
 
-                    println("$Horse $ArmorStand $plryawRotation ${PlayersVelocities[plr]}")
                     if (!RaceStarted) {
                         this.cancel()
                         return
