@@ -52,8 +52,8 @@ object VehicleUtils {
 
     //drifting
     val DriftingStartOffset = 15f // when we start drifting, rotate this much to start drifting
-    val MaxDriftingRotationSpeed = 5f
-    val MinDriftingRotationSpeed = 3f
+    val MaxDriftingRotationSpeed = 6f
+    val MinDriftingRotationSpeed = 4f
     val MaxDriftingSpeed = 0.5
 
     //TODO: ADD NEW ROTATION VARIABLE, CHANGE FROM vehicle.velocity TO vehicle.setdeltaspeed or some shi
@@ -67,6 +67,7 @@ object VehicleUtils {
                 PlayersAccelerating.remove(plr)
             }
         }
+        /*
         if (!PlayersAccelerating.contains(plr)){
             PlayersAccelerating.add(plr)
         }
@@ -77,7 +78,9 @@ object VehicleUtils {
         IncreaseVel(plr)
         //Vehicle.teleport(PlayerHorses[plr]!!)
 
+
         //Vehicle.velocity =  Vector(Vehicle.location.direction.x,1.0,Vehicle.location.direction.z).multiply(Vector(PlayersVelocities[plr]!!,-5.0,PlayersVelocities[plr]!!))
+         */
     }
 
     fun toggleSteerLeft(plr : Player, steer : Boolean){
@@ -107,11 +110,8 @@ object VehicleUtils {
 
         if (PlayersVelocities[plr]!! > 0.0 && !PlayersDrifting.contains(plr)){//PlayersAccelerating.contains(plr)
             val lastRot = PlayerRotations[plr]!!
-            val RotationSpeed = MaxRotationSpeed
-            val newRot = lastRot + RotationSpeed
 
-           // ArmorStand.setRotation(newRot.toFloat(), 0.0f)
-            PlayerRotations[plr] = newRot
+            PlayerRotations[plr] =  lastRot + MaxRotationSpeed
         }
 
     }
@@ -120,16 +120,75 @@ object VehicleUtils {
 
         if (PlayersVelocities[plr]!! > 0.0 && !PlayersDrifting.contains(plr)){//PlayersAccelerating.contains(plr)
             val lastRot = PlayerRotations[plr]!!
-            val RotationSpeed = MaxRotationSpeed
-            val newRot = lastRot - RotationSpeed
 
-            //ArmorStand.setRotation(newRot.toFloat(), 0.0f)
-            PlayerRotations[plr] = newRot
+            PlayerRotations[plr] = lastRot - MaxRotationSpeed
         }
     }
 
-    fun drift(plr : Player, sides: Float){
-        //TODO: add on drift offset and a bit of a jump (when we start give the player the bump,
+    fun toggleDrifting(plr : Player, sides : Float, drift : Boolean){
+        var lastRot = PlayerRotations[plr]!!
+
+        if (drift){
+            if (!PlayersDrifting.contains(plr)){
+                PlayersDrifting.add(plr)
+                if (sides == -0.98f){
+                    DriftingDir[plr] = "right"
+
+                    PlayerRotations[plr] = lastRot + DriftingStartOffset
+
+                    println("started originally right")
+                }
+                if (sides == 0.98f){
+                    DriftingDir[plr] = "left"
+
+                    PlayerRotations[plr] = lastRot - DriftingStartOffset
+
+                    println("started originally left")
+                }
+            }
+        }else{
+            if (PlayersDrifting.contains(plr)){
+                PlayersDrifting.remove(plr)
+                DriftingDir.remove(plr)
+                println("stop drifting")
+            }
+        }
+    }
+    fun drift(plr : Player, KeyStates: KeyState){
+        val originalDriftingDir = DriftingDir[plr]
+        val right = KeyStates.dPressed
+        val left = KeyStates.aPressed
+        if (!right && !left) return
+        if (DriftingDir[plr] != "right" && DriftingDir[plr] != "left") return
+
+        var lastRot = PlayerRotations[plr]!!
+
+        //originally right
+        if (originalDriftingDir == "right"){
+            if (right){
+                println("go in original dir")
+                PlayerRotations[plr] = lastRot + MaxDriftingRotationSpeed
+            }
+            if (left){
+                println("go in NOT original dir")
+                PlayerRotations[plr] = lastRot + MinDriftingRotationSpeed
+            }
+        }
+        //originally left
+        if (originalDriftingDir == "left"){
+            if (left){
+                println("go in original dir")
+                PlayerRotations[plr] = lastRot - MaxDriftingRotationSpeed
+            }
+            if (right){
+                println("go in NOT original dir")
+                PlayerRotations[plr] = lastRot - MinDriftingRotationSpeed
+            }
+        }
+
+    }
+    /*
+    //TODO: add on drift offset and a bit of a jump (when we start give the player the bump,
         // dont give him a bump till he stops drifting then remove his tag or smth)
         if (PlayersDrifting.contains(plr) || sides == 0f) return
 
@@ -204,7 +263,7 @@ object VehicleUtils {
         }
 
          */
-    }
+     */
 
 
     fun IncreaseVel(plr : Player){
@@ -292,7 +351,6 @@ object VehicleUtils {
 
     fun spawnHorse(worldname : String, plr : Player){
         val Horse = Bukkit.getWorld(worldname)!!.spawnEntity(Location(plr.world,plr.location.x, plr.location.y, plr.location.z), EntityType.HORSE) as Horse
-
 
         Horse.isInvulnerable = true
         Horse.isInvisible = true
@@ -388,7 +446,6 @@ object VehicleUtils {
             override fun run() {
                 if (!RaceStarted) return
                 for (plr in playersInRace) {
-
                     val Horse = PlayerHorses[plr] ?: continue
 
                     val ArmorStand = PlayerArmorStands[plr] ?: continue
@@ -416,39 +473,46 @@ object VehicleUtils {
                     if (PlayersAccelerating.contains(plr)){
                         IncreaseVel(plr)
                     }
+                    if (PlayersDrifting.contains(plr)){
+                        //TODO: ADD DRIFTING
+                        drift(plr, playerKeyStates.get(plr)!!)
+                    }
                     if (PlayersSteeringLeft.contains(plr)){
                         SteerLeft(plr)
                     }
                     if (PlayersSteeringRight.contains(plr)){
                         SteerRight(plr)
                     }
-                    if (PlayersDrifting.contains(plr)){
-                        //TODO: ADD DRIFTING
-                        //drift(plr)
-                    }
+
+                    // ROTATION
+
+                    Horse.setRotation(plryawRotation, 0.0f)
+                    ArmorStand.setRotation(plryawRotation, 0.0f)
+
+
+                    //FORCES
                     if (PlayersDrifting.contains(plr) ){ // && Velocity > (Velocity * 20/100)
                         if (DriftingDir[plr] == "left") {
-                            Horse.velocity = Vector(leftdriftingx, 0.5, leftdriftingz).multiply(
+
+                            Horse.velocity = Vector(rightdriftingx, 0.5, rightdriftingz).multiply(
                                 Vector(Velocity, -5.0, Velocity)
                             )
 
+
                         }else if (DriftingDir[plr] == "right") {
-                            Horse.velocity = Vector(rightdriftingx, 0.5, rightdriftingz).multiply(
+
+                            Horse.velocity = Vector(leftdriftingx, 0.5, leftdriftingz).multiply(
                                 Vector(Velocity, -5.0, Velocity)
                             )
 
                         }
 
-                    }else{
+                    }
+                    if (!PlayersDrifting.contains(plr)){ // PlayersAccelerating.contains(plr) &&
                         Horse.velocity = Vector(Horse.location.direction.x, 0.5, Horse.location.direction.z).multiply(
                             Vector(Velocity, -5.0, Velocity)
                         )
-
                     }
-
-                    // ROTATION
-                    Horse.setRotation(plryawRotation, 0.0f)
-                    ArmorStand.setRotation(plryawRotation, 0.0f)
 
                     // DECELERATION
                     if (!PlayersAccelerating.contains(plr) && PlayersVelocities[plr]!! > 0.0 && !PlayersDrifting.contains(plr)) {
@@ -457,13 +521,9 @@ object VehicleUtils {
 
                     }
 
-                    if (!PlayersDrifting.contains(plr)){
-                        PlayersTickDrifting[plr] = 0
-                        DriftingDir.remove(plr)
-                    }
 
                     //PlayersAccelerating.remove(plr)
-                    PlayersDrifting.remove(plr)
+                    //PlayersDrifting.remove(plr)
 
                     /*
                     if (!RaceStarted) {

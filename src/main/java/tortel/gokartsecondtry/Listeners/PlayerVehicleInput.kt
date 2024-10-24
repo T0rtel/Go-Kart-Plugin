@@ -11,6 +11,7 @@ import tortel.gokartsecondtry.Utils.KeyListener.KeyPressEvent
 import tortel.gokartsecondtry.Utils.KeyListener.KeyReleaseEvent
 import tortel.gokartsecondtry.Utils.VehicleUtils
 import tortel.gokartsecondtry.Utils.VehicleUtils.ToggleAccelerate
+import tortel.gokartsecondtry.Utils.VehicleUtils.toggleDrifting
 import tortel.gokartsecondtry.Utils.VehicleUtils.toggleSteerLeft
 import tortel.gokartsecondtry.Utils.VehicleUtils.toggleSteerRight
 
@@ -59,17 +60,26 @@ class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(
                 keyState.wPressed = newW
 
                 if (newW) {
-                    // Fire the KeyPressEvent for S key
-                    //Bukkit.getServer().pluginManager.callEvent(KeyPressEvent(plr, 'S'))
-                    //KeyPressEvent(plr, 'S')
-                    println("pressed W")
+
                     ToggleAccelerate(plr, true)
                 } else {
-                    // Fire the KeyReleaseEvent for S key
-                    //Bukkit.getServer().pluginManager.callEvent(KeyReleaseEvent(plr, 'S'))
-                    //KeyReleaseEvent(plr, 'S')
-                    println("unpressed W")
+
                     ToggleAccelerate(plr, false)
+                }
+            }
+
+
+
+            if (keyState.sPressed != newS) {
+                keyState.sPressed = newS
+
+                if (newS) {
+
+                    toggleDrifting(plr, sidewardMovement, true)
+                } else {
+
+                    toggleDrifting(plr, sidewardMovement, false)
+
                 }
             }
 
@@ -77,35 +87,12 @@ class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(
                 keyState.aPressed = newA
 
                 if (newA) {
-                    // Fire the KeyPressEvent for S key
-                    //Bukkit.getServer().pluginManager.callEvent(KeyPressEvent(plr, 'S'))
-                    //KeyPressEvent(plr, 'S')
+
                     println("pressed A")
                     toggleSteerLeft(plr, true)
                 } else {
-                    // Fire the KeyReleaseEvent for S key
-                    //Bukkit.getServer().pluginManager.callEvent(KeyReleaseEvent(plr, 'S'))
-                    //KeyReleaseEvent(plr, 'S')
-                    println("unpressed A")
+
                     toggleSteerLeft(plr, false)
-                }
-            }
-
-            if (keyState.sPressed != newS) {
-                keyState.sPressed = newS
-
-                if (newS) {
-                    // Fire the KeyPressEvent for S key
-                    //Bukkit.getServer().pluginManager.callEvent(KeyPressEvent(plr, 'S'))
-                    //KeyPressEvent(plr, 'S')
-                    println("pressed S")
-                } else {
-                    // Fire the KeyReleaseEvent for S key
-                    //Bukkit.getServer().pluginManager.callEvent(KeyReleaseEvent(plr, 'S'))
-                    //KeyReleaseEvent(plr, 'S')
-                   // println(newW)
-                    println("unpressed S")
-
                 }
             }
 
@@ -113,16 +100,10 @@ class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(
                 keyState.dPressed = newD
 
                 if (newD) {
-                    // Fire the KeyPressEvent for S key
-                    //Bukkit.getServer().pluginManager.callEvent(KeyPressEvent(plr, 'S'))
-                    //KeyPressEvent(plr, 'S')
-                    println("pressed D")
+
                     toggleSteerRight(plr, true)
                 } else {
-                    // Fire the KeyReleaseEvent for S key
-                    //Bukkit.getServer().pluginManager.callEvent(KeyReleaseEvent(plr, 'S'))
-                    //KeyReleaseEvent(plr, 'S')
-                    println("unpressed D")
+
                     toggleSteerRight(plr, false)
                 }
             }
