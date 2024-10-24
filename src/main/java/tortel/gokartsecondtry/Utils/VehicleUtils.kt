@@ -512,7 +512,7 @@ object VehicleUtils {
                         Horse.velocity = Vector(Horse.location.direction.x, 0.5, Horse.location.direction.z).multiply(
                             Vector(Velocity, -5.0, Velocity)
                         )
-                    }
+                    }//w
 
                     // DECELERATION
                     if (!PlayersAccelerating.contains(plr) && PlayersVelocities[plr]!! > 0.0 && !PlayersDrifting.contains(plr)) {
