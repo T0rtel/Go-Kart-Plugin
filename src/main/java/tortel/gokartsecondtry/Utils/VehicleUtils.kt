@@ -22,7 +22,17 @@ import kotlin.math.sin
 
 object VehicleUtils {
 
+    data class KeyState(
+        var wPressed : Boolean = false,
+        var aPressed : Boolean = false,
+        var sPressed: Boolean = false,
+        var dPressed : Boolean = false
+    )
+
     val PlayersAccelerating = mutableListOf<Player>()
+    val PlayersSteeringLeft = mutableListOf<Player>()
+    val PlayersSteeringRight = mutableListOf<Player>()
+
     val PlayersVelocities = mutableMapOf<Player, Double>()
     val PlayerRotations = mutableMapOf<Player, Float>()
     val PlayerHorses = mutableMapOf<Player, Entity>()
@@ -30,6 +40,8 @@ object VehicleUtils {
     val PlayersDrifting = mutableListOf<Player>()
     val DriftingDir = mutableMapOf<Player, String>()
     val PlayersTickDrifting = mutableMapOf<Player, Int>()
+
+    val playerKeyStates = mutableMapOf<Player, KeyState>()
 
     //driving
     val Acceleration = 0.05 //per tick
@@ -45,7 +57,16 @@ object VehicleUtils {
     val MaxDriftingSpeed = 0.5
 
     //TODO: ADD NEW ROTATION VARIABLE, CHANGE FROM vehicle.velocity TO vehicle.setdeltaspeed or some shi
-    fun MoveForward(plr: Player){
+    fun ToggleAccelerate(plr: Player, accelerate : Boolean){
+        if (accelerate){
+            if (!PlayersAccelerating.contains(plr)){
+                PlayersAccelerating.add(plr)
+            }
+        }else{
+            if (PlayersAccelerating.contains(plr)){
+                PlayersAccelerating.remove(plr)
+            }
+        }
         if (!PlayersAccelerating.contains(plr)){
             PlayersAccelerating.add(plr)
         }
@@ -59,6 +80,29 @@ object VehicleUtils {
         //Vehicle.velocity =  Vector(Vehicle.location.direction.x,1.0,Vehicle.location.direction.z).multiply(Vector(PlayersVelocities[plr]!!,-5.0,PlayersVelocities[plr]!!))
     }
 
+    fun toggleSteerLeft(plr : Player, steer : Boolean){
+        if (steer){
+            if (!PlayersSteeringLeft.contains(plr)){
+                PlayersSteeringLeft.add(plr)
+            }
+        }else{
+            if (PlayersSteeringLeft.contains(plr)){
+                PlayersSteeringLeft.remove(plr)
+            }
+        }
+    }
+
+    fun toggleSteerRight(plr : Player, steer : Boolean){
+        if (steer){
+            if (!PlayersSteeringRight.contains(plr)){
+                PlayersSteeringRight.add(plr)
+            }
+        }else{
+            if (PlayersSteeringRight.contains(plr)){
+                PlayersSteeringRight.remove(plr)
+            }
+        }
+    }
     fun SteerRight(plr : Player){
 
         if (PlayersVelocities[plr]!! > 0.0 && !PlayersDrifting.contains(plr)){//PlayersAccelerating.contains(plr)
@@ -88,8 +132,9 @@ object VehicleUtils {
         //TODO: add on drift offset and a bit of a jump (when we start give the player the bump,
         // dont give him a bump till he stops drifting then remove his tag or smth)
         if (PlayersDrifting.contains(plr) || sides == 0f) return
+
         PlayersDrifting.add(plr)
-        var isfirstTick = false
+
         var lastRot = PlayerRotations[plr]!!
 
         if (!PlayersTickDrifting.contains(plr)){
@@ -100,22 +145,26 @@ object VehicleUtils {
         if (PlayersTickDrifting[plr] == 0){
             PlayersTickDrifting[plr] = 1
             //do first tick stuff
-            isfirstTick = true
-            println("just started drifting")
 
             if (sides == -0.98f){
                 DriftingDir[plr] = "left"
+                PlayersTickDrifting[plr] = 1
 
                 PlayerRotations[plr] = lastRot + DriftingStartOffset
                 lastRot += DriftingStartOffset
+
+                println("started originally left")
 
                 //PlayerRotations[plr] = PlayerRotations[plr]!! + MaxDriftingRotationSpeed
             }
             if (sides == 0.98f){
                 DriftingDir[plr] = "right"
+                PlayersTickDrifting[plr] = 1
 
                 PlayerRotations[plr] = lastRot - DriftingStartOffset
                 lastRot -= DriftingStartOffset
+
+                println("started originally right")
 
                 //PlayerRotations[plr] = PlayerRotations[plr]!! - MaxDriftingRotationSpeed
             }
@@ -128,18 +177,18 @@ object VehicleUtils {
             }
             if (sides == 0.98f){ // BUT if its going right (originally left) angle decreases
 
-                PlayerRotations[plr] = lastRot - MinDriftingRotationSpeed
+                PlayerRotations[plr] = lastRot + MinDriftingRotationSpeed
             }
         }
 
         if (DriftingDir[plr] == "right"){ // originally going right
             if (sides == 0.98f){ // is still going right, angle stays the same, increased
 
-                PlayerRotations[plr] = lastRot + MaxDriftingRotationSpeed
+                PlayerRotations[plr] = lastRot - MaxDriftingRotationSpeed
             }
             if (sides == -0.98f){ // UT if its going left (originally left) angle decreases
 
-                PlayerRotations[plr] = lastRot + MinDriftingRotationSpeed
+                PlayerRotations[plr] = lastRot - MinDriftingRotationSpeed
             }
         }
         /*
@@ -348,7 +397,7 @@ object VehicleUtils {
 
                     val Velocity = PlayersVelocities[plr] ?: continue
 
-                    println("$PlayersDrifting $DriftingDir")
+                   // println("$PlayersDrifting $DriftingDir")
 
                     val forwardSpeed = 1 // Increased forward speed
                     val diagonalOffset = 0.3 // Decreased rightward offset
@@ -364,15 +413,30 @@ object VehicleUtils {
 
 
                     // VELOCITY
-                    if (PlayersDrifting.contains(plr) && Velocity > (Velocity * 20/100)){
+                    if (PlayersAccelerating.contains(plr)){
+                        IncreaseVel(plr)
+                    }
+                    if (PlayersSteeringLeft.contains(plr)){
+                        SteerLeft(plr)
+                    }
+                    if (PlayersSteeringRight.contains(plr)){
+                        SteerRight(plr)
+                    }
+                    if (PlayersDrifting.contains(plr)){
+                        //TODO: ADD DRIFTING
+                        //drift(plr)
+                    }
+                    if (PlayersDrifting.contains(plr) ){ // && Velocity > (Velocity * 20/100)
                         if (DriftingDir[plr] == "left") {
                             Horse.velocity = Vector(leftdriftingx, 0.5, leftdriftingz).multiply(
                                 Vector(Velocity, -5.0, Velocity)
                             )
+
                         }else if (DriftingDir[plr] == "right") {
                             Horse.velocity = Vector(rightdriftingx, 0.5, rightdriftingz).multiply(
                                 Vector(Velocity, -5.0, Velocity)
                             )
+
                         }
 
                     }else{
@@ -395,16 +459,19 @@ object VehicleUtils {
 
                     if (!PlayersDrifting.contains(plr)){
                         PlayersTickDrifting[plr] = 0
+                        DriftingDir.remove(plr)
                     }
 
-                    PlayersAccelerating.remove(plr)
+                    //PlayersAccelerating.remove(plr)
                     PlayersDrifting.remove(plr)
-                    DriftingDir.remove(plr)
 
+                    /*
                     if (!RaceStarted) {
                         this.cancel()
                         return
                     }
+
+                     */
                 }
 
             }

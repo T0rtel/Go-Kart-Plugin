@@ -1,10 +1,19 @@
 package tortel.gokartsecondtry.Listeners
 
 import com.comphenix.protocol.PacketType
+import com.comphenix.protocol.events.ListenerPriority
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
+import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
+import tortel.gokartsecondtry.Main
+import tortel.gokartsecondtry.Utils.KeyListener.KeyPressEvent
+import tortel.gokartsecondtry.Utils.KeyListener.KeyReleaseEvent
 import tortel.gokartsecondtry.Utils.VehicleUtils
+import tortel.gokartsecondtry.Utils.VehicleUtils.ToggleAccelerate
+import tortel.gokartsecondtry.Utils.VehicleUtils.toggleSteerLeft
+import tortel.gokartsecondtry.Utils.VehicleUtils.toggleSteerRight
+
 /*
 class PlayerVehicleInput() : Listener{
     @EventHandler
@@ -16,7 +25,11 @@ class PlayerVehicleInput() : Listener{
  */
 
 
-class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(params().plugin(plugin).types(PacketType.Play.Client.STEER_VEHICLE)) {
+class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(
+    Main.instance!!,
+    ListenerPriority.NORMAL,  // Synchronous priority
+    PacketType.Play.Client.STEER_VEHICLE) {
+
 
     override fun onPacketReceiving(event: PacketEvent){
         //detect if player moves //STEER_VEHICLE
@@ -28,30 +41,108 @@ class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(params().plugin(plugin
             }
             if (!VehicleUtils.PlayerRotations.contains(plr)){
                 VehicleUtils.PlayerRotations.put(plr, 0.0f)
-                println(VehicleUtils.PlayerRotations)
             }
 
-            val packet = event.packet
-            val frontAndBack = event.packet.float.read(1)
-            val sides = event.packet.float.read(0)
+            val forwardMovement = event.packet.float.read(1) // W/S
+            val sidewardMovement = event.packet.float.read(0) // A/D
 
+            val newS = forwardMovement < 0 // S key pressed when forwardMovement is negative
+            val newW = forwardMovement > 0
+            val newA = sidewardMovement > 0
+            val newD = sidewardMovement < 0
+
+            val keyState = VehicleUtils.playerKeyStates.getOrPut(plr) { VehicleUtils.KeyState() }
+
+            //println(forwardMovement)
+            // If S key state changes, fire the appropriate event
+            if (keyState.wPressed != newW) {
+                keyState.wPressed = newW
+
+                if (newW) {
+                    // Fire the KeyPressEvent for S key
+                    //Bukkit.getServer().pluginManager.callEvent(KeyPressEvent(plr, 'S'))
+                    //KeyPressEvent(plr, 'S')
+                    println("pressed W")
+                    ToggleAccelerate(plr, true)
+                } else {
+                    // Fire the KeyReleaseEvent for S key
+                    //Bukkit.getServer().pluginManager.callEvent(KeyReleaseEvent(plr, 'S'))
+                    //KeyReleaseEvent(plr, 'S')
+                    println("unpressed W")
+                    ToggleAccelerate(plr, false)
+                }
+            }
+
+            if (keyState.aPressed != newA) {
+                keyState.aPressed = newA
+
+                if (newA) {
+                    // Fire the KeyPressEvent for S key
+                    //Bukkit.getServer().pluginManager.callEvent(KeyPressEvent(plr, 'S'))
+                    //KeyPressEvent(plr, 'S')
+                    println("pressed A")
+                    toggleSteerLeft(plr, true)
+                } else {
+                    // Fire the KeyReleaseEvent for S key
+                    //Bukkit.getServer().pluginManager.callEvent(KeyReleaseEvent(plr, 'S'))
+                    //KeyReleaseEvent(plr, 'S')
+                    println("unpressed A")
+                    toggleSteerLeft(plr, false)
+                }
+            }
+
+            if (keyState.sPressed != newS) {
+                keyState.sPressed = newS
+
+                if (newS) {
+                    // Fire the KeyPressEvent for S key
+                    //Bukkit.getServer().pluginManager.callEvent(KeyPressEvent(plr, 'S'))
+                    //KeyPressEvent(plr, 'S')
+                    println("pressed S")
+                } else {
+                    // Fire the KeyReleaseEvent for S key
+                    //Bukkit.getServer().pluginManager.callEvent(KeyReleaseEvent(plr, 'S'))
+                    //KeyReleaseEvent(plr, 'S')
+                   // println(newW)
+                    println("unpressed S")
+
+                }
+            }
+
+            if (keyState.dPressed != newD) {
+                keyState.dPressed = newD
+
+                if (newD) {
+                    // Fire the KeyPressEvent for S key
+                    //Bukkit.getServer().pluginManager.callEvent(KeyPressEvent(plr, 'S'))
+                    //KeyPressEvent(plr, 'S')
+                    println("pressed D")
+                    toggleSteerRight(plr, true)
+                } else {
+                    // Fire the KeyReleaseEvent for S key
+                    //Bukkit.getServer().pluginManager.callEvent(KeyReleaseEvent(plr, 'S'))
+                    //KeyReleaseEvent(plr, 'S')
+                    println("unpressed D")
+                    toggleSteerRight(plr, false)
+                }
+            }
             //if (frontAndBack == 0.0f) return
             //VehicleUtils.ApplyVelocity(plr, frontAndBack.toDouble(), sides.toDouble())
-            if (frontAndBack == 0.98f){
+            if (forwardMovement == 0.98f){
                // println("W")
-                VehicleUtils.MoveForward(plr)
+                //VehicleUtils.MoveForward(plr)
             }
-            if (frontAndBack == -0.98f){
+            if (forwardMovement == -0.98f){
                // println("S")
-                VehicleUtils.drift(plr, sides)
+                //VehicleUtils.drift(plr, sidewardMovement)
 
             }
-            if (sides == 0.98f){
+            if (sidewardMovement == 0.98f){
                // println("A")
-                VehicleUtils.SteerLeft(plr)
+                //VehicleUtils.SteerLeft(plr)
             }
-            if (sides == -0.98f){
-                VehicleUtils.SteerRight(plr)
+            if (sidewardMovement == -0.98f){
+                //VehicleUtils.SteerRight(plr)
             }
 
         }

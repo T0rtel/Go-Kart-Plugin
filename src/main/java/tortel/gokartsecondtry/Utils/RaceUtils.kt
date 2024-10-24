@@ -31,7 +31,7 @@ object RaceUtils {
         //starting
         RaceStarted = true
 
-        VehicleUtils.startRaceTicking()
+        //VehicleUtils.startRaceTicking()
 
         println("began race")
     }

@@ -33,6 +33,7 @@ class Main : JavaPlugin() {
 
         registerEvents()
         registerCommands()
+        VehicleUtils.startRaceTicking()
         //setupTickSystem()
         logger.info("GoKart Plugin Enabled!")
     }
@@ -45,7 +46,7 @@ class Main : JavaPlugin() {
 
     fun registerEvents(){
         protocolManager!!.addPacketListener(PlayerVehicleInput(this))
-        protocolManager!!.addPacketListener(UnHeldKeyEvent(this))
+        //protocolManager!!.addPacketListener(UnHeldKeyEvent(this))
         pluginmanager.registerEvents(PlayerJoinEvent(), this)
         pluginmanager.registerEvents(PlayerSpaceHeld(), this)
         pluginmanager.registerEvents(PlayerQuitVehicle(), this)
