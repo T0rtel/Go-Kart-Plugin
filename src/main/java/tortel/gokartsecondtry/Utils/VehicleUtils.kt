@@ -47,7 +47,7 @@ object VehicleUtils {
     val Acceleration = 0.05 //per tick
     val deceleration = 0.01
     val MaxSpeed = 0.8 // 0.8 * 20 = 16 blocks/second
-    val MaxRotationSpeed = 2f
+    val MaxRotationSpeed = 3f
     val bouncePower = -2.5
 
     //drifting
@@ -136,21 +136,21 @@ object VehicleUtils {
 
                     PlayerRotations[plr] = lastRot + DriftingStartOffset
 
-                    println("started originally right")
+                   // println("started originally right")
                 }
                 if (sides == 0.98f){
                     DriftingDir[plr] = "left"
 
                     PlayerRotations[plr] = lastRot - DriftingStartOffset
 
-                    println("started originally left")
+                   // println("started originally left")
                 }
             }
         }else{
             if (PlayersDrifting.contains(plr)){
                 PlayersDrifting.remove(plr)
                 DriftingDir.remove(plr)
-                println("stop drifting")
+                //println("stop drifting")
             }
         }
     }
@@ -166,22 +166,22 @@ object VehicleUtils {
         //originally right
         if (originalDriftingDir == "right"){
             if (right){
-                println("go in original dir")
+               // println("go in original dir")
                 PlayerRotations[plr] = lastRot + MaxDriftingRotationSpeed
             }
             if (left){
-                println("go in NOT original dir")
+               // println("go in NOT original dir")
                 PlayerRotations[plr] = lastRot + MinDriftingRotationSpeed
             }
         }
         //originally left
         if (originalDriftingDir == "left"){
             if (left){
-                println("go in original dir")
+               // println("go in original dir")
                 PlayerRotations[plr] = lastRot - MaxDriftingRotationSpeed
             }
             if (right){
-                println("go in NOT original dir")
+               // println("go in NOT original dir")
                 PlayerRotations[plr] = lastRot - MinDriftingRotationSpeed
             }
         }
@@ -190,6 +190,7 @@ object VehicleUtils {
     /*
     //TODO: add on drift offset and a bit of a jump (when we start give the player the bump,
         // dont give him a bump till he stops drifting then remove his tag or smth)
+
         if (PlayersDrifting.contains(plr) || sides == 0f) return
 
         PlayersDrifting.add(plr)

@@ -88,7 +88,7 @@ class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(
 
                 if (newA) {
 
-                    println("pressed A")
+
                     toggleSteerLeft(plr, true)
                 } else {
 

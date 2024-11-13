@@ -9,7 +9,7 @@ class PlayerQuitVehicle : Listener {
     @EventHandler
     fun onquit(event : PlayerToggleSneakEvent){
         if (event.player.vehicle != null){
-            //event.isCancelled = true
+            event.isCancelled = true
         }
 
     }
