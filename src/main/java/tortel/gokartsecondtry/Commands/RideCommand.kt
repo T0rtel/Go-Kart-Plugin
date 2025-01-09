@@ -19,7 +19,7 @@ import tortel.gokartsecondtry.Utils.VehicleUtils.getMobPlayerIsRiding
 
 
 class RideCommand : CommandExecutor {
-    override fun onCommand(sender: CommandSender, command: Command, p2: String, args: Array<out String>?): Boolean {
+    override fun onCommand(sender: CommandSender, command: Command, p2: String, args: Array<out String>): Boolean {
         if (sender !is Player) return false
         val plr = sender
 

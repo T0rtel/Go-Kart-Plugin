@@ -5,11 +5,14 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import revxrsal.commands.bukkit.actor.BukkitCommandActor
+import revxrsal.commands.command.CommandActor
 import tortel.gokartsecondtry.Utils.RaceUtils
 
 
-class RaceCommand : CommandExecutor {
-    override fun onCommand(sender: CommandSender, command: Command, p2: String, args: Array<out String>?): Boolean {
+class RaceCommand { //:CommandExecutor
+    /*
+     override fun onCommand(sender: CommandSender, command: Command, p2: String, args: Array<out String>): Boolean {
         if (sender !is Player || args.isNullOrEmpty()) return false
         if (args[0] == "start"){
             RaceUtils.setupAndStartRace(args[1])
@@ -20,5 +23,10 @@ class RaceCommand : CommandExecutor {
         }
 
         return false
+    }
+     */
+    @revxrsal.commands.annotation.Command("race")
+    fun race(actor: BukkitCommandActor, value : String){ // , value : String
+        println("${actor.name()} wanna start race value to $value")
     }
 }

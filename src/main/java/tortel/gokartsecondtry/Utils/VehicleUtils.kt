@@ -167,10 +167,12 @@ object VehicleUtils {
         if (originalDriftingDir == "right"){
             if (right){
                // println("go in original dir")
+                Bukkit.broadcastMessage("not Wide angle drift")
                 PlayerRotations[plr] = lastRot + MaxDriftingRotationSpeed
             }
             if (left){
                // println("go in NOT original dir")
+                Bukkit.broadcastMessage("Wide angle drift")
                 PlayerRotations[plr] = lastRot + MinDriftingRotationSpeed
             }
         }
@@ -178,10 +180,12 @@ object VehicleUtils {
         if (originalDriftingDir == "left"){
             if (left){
                // println("go in original dir")
+                Bukkit.broadcastMessage("not Wide angle drift")
                 PlayerRotations[plr] = lastRot - MaxDriftingRotationSpeed
             }
             if (right){
                // println("go in NOT original dir")
+                Bukkit.broadcastMessage("Wide angle drift")
                 PlayerRotations[plr] = lastRot - MinDriftingRotationSpeed
             }
         }
