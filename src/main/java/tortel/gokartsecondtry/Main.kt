@@ -21,6 +21,7 @@ import tortel.gokartsecondtry.Listeners.*
 import tortel.gokartsecondtry.Utils.RaceUtils
 import tortel.gokartsecondtry.Utils.RaceUtils.playersInRace
 import tortel.gokartsecondtry.Utils.VehicleUtils
+import tortel.gokartsecondtry.data.RaceTracksConfig
 import java.io.File
 
 class Main : JavaPlugin() {
@@ -37,10 +38,8 @@ class Main : JavaPlugin() {
         protocolManager = ProtocolLibrary.getProtocolManager()
         dataFolderDir = dataFolder
         instance = this
-        val lamp: Lamp<BukkitCommandActor> = BukkitLamp.builder(this)
-            .build()
-        lamp.register(RaceCommand())
 
+        setupConfigsOnEnable()
         registerEvents()
         registerCommands()
         VehicleUtils.startRaceTicking()
@@ -51,6 +50,7 @@ class Main : JavaPlugin() {
     override fun onDisable() {
         // Plugin shutdown logic
         onDisablelogic()
+        setupConfigsOnDisable()
         RaceUtils.stopRace("whateva")
     }
 
@@ -64,8 +64,29 @@ class Main : JavaPlugin() {
     }
 
     fun registerCommands(){
+        val lamp: Lamp<BukkitCommandActor> = BukkitLamp.builder(this)
+            .build()
+
+        lamp.register(RaceCommand())
         getCommand("ride")?.setExecutor(RideCommand())
         //getCommand("race")?.setExecutor(RaceCommand())
+    }
+
+    private fun setupConfigsOnEnable() {
+        config.set("plrcount", 0)
+        saveConfig()
+
+        RaceTracksConfig.load()
+
+
+        logger.info("Configs Setup!")
+    }
+
+    private fun setupConfigsOnDisable() {
+        RaceTracksConfig.save()
+
+
+        logger.info("Configs Saved! ")
     }
 
     fun onDisablelogic(){
