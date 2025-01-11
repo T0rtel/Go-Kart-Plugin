@@ -106,8 +106,12 @@
                 </executions>
                 <configuration>
                     <jvmTarget>1.8</jvmTarget>
+                    <args>
+                        <arg>-java-parameters</arg>
+                    </args>
                 </configuration>
             </plugin>
+
             <!--
             <plugin>
                 <groupId>ca.bkaw</groupId>

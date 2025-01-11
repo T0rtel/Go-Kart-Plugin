@@ -3,23 +3,20 @@ package tortel.gokartsecondtry
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.ProtocolManager
 import org.bukkit.Bukkit
-import org.bukkit.entity.ArmorStand
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.Vector
 import revxrsal.commands.Lamp
-import revxrsal.commands.LampBuilderVisitor
-import revxrsal.commands.command.CommandActor
-import revxrsal.commands.Lamp.builder
-import revxrsal.commands.annotation.Command
 import revxrsal.commands.bukkit.BukkitLamp
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import tortel.gokartsecondtry.Commands.RaceCommand
 import tortel.gokartsecondtry.Commands.RideCommand
+import tortel.gokartsecondtry.Commands.TrackSetup.RacePosCommands
 import tortel.gokartsecondtry.Listeners.*
 import tortel.gokartsecondtry.Utils.RaceUtils
 import tortel.gokartsecondtry.Utils.RaceUtils.playersInRace
+import tortel.gokartsecondtry.Utils.RacingTracksConfigUtils
 import tortel.gokartsecondtry.Utils.VehicleUtils
 import tortel.gokartsecondtry.data.RaceTracksConfig
 import java.io.File
@@ -68,7 +65,9 @@ class Main : JavaPlugin() {
             .build()
 
         lamp.register(RaceCommand())
-        getCommand("ride")?.setExecutor(RideCommand())
+        lamp.register(RideCommand())
+        lamp.register(RacePosCommands())
+        //getCommand("ride")?.setExecutor(RideCommand())
         //getCommand("race")?.setExecutor(RaceCommand())
     }
 

@@ -1,11 +1,10 @@
 package tortel.gokartsecondtry.data
 
-import org.bukkit.Bukkit
-import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import tortel.gokartsecondtry.Main
+import tortel.gokartsecondtry.Utils.RacingTracksConfigUtils
 import java.io.File
 
 object RaceTracksConfig {
@@ -33,7 +32,10 @@ object RaceTracksConfig {
             //config.save(file)
             config.load(file)
             config.set("working", true)
+            save()
             Main.instance?.logger?.info("RACETRACKS Config Setup Status : ${config.get("working")}")
+
+            RacingTracksConfigUtils.loadRacingTracksConfig()
             //Main.instance?.logger?.info("${config.get("cached.TTortel.discordId")}")
         }catch (e:Exception){
             e.printStackTrace()

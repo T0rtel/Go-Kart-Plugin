@@ -26,7 +26,16 @@ class RaceCommand { //:CommandExecutor
     }
      */
     @revxrsal.commands.annotation.Command("race")
-    fun race(actor: BukkitCommandActor, value : String){ // , value : String
-        println("${actor.name()} wanna start race value to $value")
+    fun race(actor: BukkitCommandActor, value : String, worldName : String){ // , value : String
+        if (actor !is Player) return
+        if (value == "start"){
+            RaceUtils.setupAndStartRace(worldName)
+        }
+        if (value == "stop"){
+            //TODO:STOP RACE AND STUFF
+            RaceUtils.stopRace(worldName)
+        }
+
+        return
     }
 }
