@@ -6,13 +6,8 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Location
 
-
-import org.bukkit.command.Command
-import org.bukkit.command.CommandExecutor
-import org.bukkit.command.CommandSender
-
-
 import org.bukkit.entity.*
+import revxrsal.commands.annotation.Command
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import tortel.gokartsecondtry.Utils.VehicleUtils.PlayerArmorStands
 import tortel.gokartsecondtry.Utils.VehicleUtils.PlayerHorses
@@ -224,14 +219,14 @@ class RideCommand  { // : CommandExecutor
         return false
     }
      */
-    @revxrsal.commands.annotation.Command("ride")
+    @Command("ride")
     fun ride (sender : BukkitCommandActor){
         if (sender !is Player) return
         val plr = sender
 
         //TODO: ADD VEHICLE MODEL
 
-        val Horse = plr.world.spawnEntity(Location(plr.world,plr.location.x, plr.location.y, plr.location.z), EntityType.HORSE) as org.bukkit.entity.Horse
+        val Horse = plr.world.spawnEntity(Location(plr.world,plr.location.x, plr.location.y, plr.location.z, plr.location.yaw, 0.0f), EntityType.HORSE) as org.bukkit.entity.Horse
 
 
         Horse.isInvulnerable = true

@@ -38,8 +38,9 @@ class Main : JavaPlugin() {
 
         setupConfigsOnEnable()
         registerEvents()
-        registerCommands()
+        registerCommands(this)
         VehicleUtils.startRaceTicking()
+        //setupConfigTickSystem()
         //setupTickSystem()
         logger.info("GoKart Plugin Enabled!")
     }
@@ -60,8 +61,8 @@ class Main : JavaPlugin() {
 
     }
 
-    fun registerCommands(){
-        val lamp: Lamp<BukkitCommandActor> = BukkitLamp.builder(this)
+    fun registerCommands(plugin: JavaPlugin){
+        val lamp: Lamp<BukkitCommandActor> = BukkitLamp.builder(plugin)
             .build()
 
         lamp.register(RaceCommand())
@@ -107,6 +108,15 @@ class Main : JavaPlugin() {
             VehicleUtils.PlayerArmorStands.remove(player)
         }
 
+    }
+
+    private fun setupConfigTickSystem(){
+        object : BukkitRunnable() {
+            override fun run() {
+                // CachedConfig.reload() // so if anyone verifies his discord it could be detected
+                RaceTracksConfig.reload()
+            }
+        }.runTaskTimer(this, 1, 20)
     }
 
     fun setupTickSystem(){

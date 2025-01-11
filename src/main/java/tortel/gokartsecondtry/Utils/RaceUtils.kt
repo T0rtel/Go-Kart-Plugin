@@ -1,13 +1,16 @@
 package tortel.gokartsecondtry.Utils
 
+
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import tortel.gokartsecondtry.Utils.RacingTracksConfigUtils.getTrackCoords
 import tortel.gokartsecondtry.Utils.VehicleUtils.despawnArmorStand
 import tortel.gokartsecondtry.Utils.VehicleUtils.despawnHorse
 import tortel.gokartsecondtry.Utils.VehicleUtils.resetAllValues
 import tortel.gokartsecondtry.Utils.VehicleUtils.spawnArmorStand
 import tortel.gokartsecondtry.Utils.VehicleUtils.spawnHorse
+
 
 object RaceUtils {
     var RaceStarted = false
@@ -18,15 +21,18 @@ object RaceUtils {
         "kartmap" to Location(Bukkit.getWorld("kartmap"), 123.5, 32.0, 10.5, 90F, 0F)
     )
 
+    var chosenPlayers = mutableListOf<String>()
+
     //TODO: CHANGE - or + depending on the map name
-    fun setupAndStartRace(RaceName : String){
+    fun setupAndStartRace(TrackName: String){
         //teleporting players
 
-        if (!canSetup(RaceName)) return
+        if (!canSetup(TrackName)) return
+        println("setting up the race")
         //setting up
-        tpPlayerstoMap(RaceName)
+        tpPlayerstoMap(TrackName)
 
-        spawnVehicles(RaceName)
+        spawnVehicles(TrackName)
 
         //starting
         RaceStarted = true
@@ -46,7 +52,34 @@ object RaceUtils {
         println("stopped race")
     }
 
-    fun tpPlayerstoMap(raceName: String){
+    fun tpPlayerstoMap(TrackName: String){
+        println("Tping players to track")
+
+        var i = 1
+        Bukkit.getOnlinePlayers().forEach { plr ->
+            val players = Bukkit.getOnlinePlayers()
+                .filter { !chosenPlayers.contains(it.name) } // Exclude already chosen players
+
+            if (players.isEmpty()) return
+
+            val selectedplr: Player = players.random()
+
+            //chosenPlayers.plus(selectedplr.name)
+            //chosenPlayers += selectedplr.name
+            chosenPlayers.add(selectedplr.name)
+
+            val loc = getTrackCoords(TrackName, i)
+            //println("want to tp ${selectedplr.name} to ${loc.x} ${loc.y} ${loc.z} ${loc.pitch} in which his number is $i  player")
+            //println(chosenPlayers)
+            selectedplr.teleport(loc)
+
+            i++
+        }
+
+        chosenPlayers.clear()
+        println("cleared chosen players")
+        /*
+
         val coords = RaceCoords[raceName]!!
         for ((index, onlineplayer) in Bukkit.getOnlinePlayers().withIndex()) {
             if (index < 5 ){
@@ -63,13 +96,15 @@ object RaceUtils {
                     coords.z - ((index - 5) * 2.0),coords.yaw, coords.pitch)) //((index - 1) * 2.0),0.0,((index - 1) * 2.0))
             }
         }
+         */
+
     }
 
-    fun spawnVehicles(raceName: String){
+    fun spawnVehicles(TrackName: String){
         for (onlineplayer in Bukkit.getOnlinePlayers()) {
             //TODO: IF PLAYER IS READY FOR A RACE
-            spawnHorse(raceName, onlineplayer)
-            spawnArmorStand(raceName, onlineplayer)
+            spawnHorse(TrackName, onlineplayer)
+            spawnArmorStand(TrackName, onlineplayer)
 
             playersInRace.add(onlineplayer)
         }

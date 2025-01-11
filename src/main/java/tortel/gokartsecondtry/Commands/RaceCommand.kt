@@ -1,12 +1,11 @@
 package tortel.gokartsecondtry.Commands
 
 
-import org.bukkit.command.Command
-import org.bukkit.command.CommandExecutor
-import org.bukkit.command.CommandSender
+
 import org.bukkit.entity.Player
+import revxrsal.commands.annotation.Command
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
-import revxrsal.commands.command.CommandActor
+
 import tortel.gokartsecondtry.Utils.RaceUtils
 
 
@@ -25,15 +24,16 @@ class RaceCommand { //:CommandExecutor
         return false
     }
      */
-    @revxrsal.commands.annotation.Command("race")
-    fun race(actor: BukkitCommandActor, value : String, worldName : String){ // , value : String
-        if (actor !is Player) return
+    @Command("race")
+    fun race(sender: Player, value : String, TrackName : String){ // , value : String
+        if (!sender.isOp) return
         if (value == "start"){
-            RaceUtils.setupAndStartRace(worldName)
+            println("Track name is $TrackName")
+            RaceUtils.setupAndStartRace(TrackName)
         }
         if (value == "stop"){
             //TODO:STOP RACE AND STUFF
-            RaceUtils.stopRace(worldName)
+            RaceUtils.stopRace(TrackName)
         }
 
         return

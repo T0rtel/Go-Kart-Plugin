@@ -6,6 +6,7 @@ import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.annotation.Suggest
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import tortel.gokartsecondtry.Utils.RacingTracksConfigUtils
+import tortel.gokartsecondtry.data.RaceTracksConfig
 
 
 @Command("racepos")
