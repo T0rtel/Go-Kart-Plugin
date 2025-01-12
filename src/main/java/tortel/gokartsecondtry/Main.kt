@@ -3,6 +3,7 @@ package tortel.gokartsecondtry
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.ProtocolManager
 import org.bukkit.Bukkit
+import org.bukkit.entity.EntityType
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
@@ -15,11 +16,12 @@ import tortel.gokartsecondtry.Commands.RideCommand
 import tortel.gokartsecondtry.Commands.TrackSetup.RacePosCommands
 import tortel.gokartsecondtry.Listeners.*
 import tortel.gokartsecondtry.Utils.RaceUtils
-import tortel.gokartsecondtry.Utils.RaceUtils.playersInRace
+import tortel.gokartsecondtry.Utils.RaceUtils.PlayersInRace
 import tortel.gokartsecondtry.Utils.RacingTracksConfigUtils
 import tortel.gokartsecondtry.Utils.VehicleUtils
 import tortel.gokartsecondtry.data.RaceTracksConfig
 import java.io.File
+import java.util.*
 
 class Main : JavaPlugin() {
     val pluginmanager = Bukkit.getPluginManager()
@@ -100,12 +102,12 @@ class Main : JavaPlugin() {
         }
 
         //remove all horses
-        VehicleUtils.PlayerArmorStands.forEach {
+        VehicleUtils.PlayerItemDisplays.forEach {
             val Entity = it.value
             val player = it.key
 
             Entity.remove()
-            VehicleUtils.PlayerArmorStands.remove(player)
+            VehicleUtils.PlayerItemDisplays.remove(player)
         }
 
     }
@@ -114,24 +116,32 @@ class Main : JavaPlugin() {
         object : BukkitRunnable() {
             override fun run() {
                 // CachedConfig.reload() // so if anyone verifies his discord it could be detected
-                RaceTracksConfig.reload()
+                //RaceTracksConfig.reload()
+                if (!RaceUtils.RaceStarted) return
+                Bukkit.getWorld("kartmap")!!.entities.forEach { entity ->
+                    if (entity.type == EntityType.ITEM_DISPLAY){
+                        entity.teleport(
+                            VehicleUtils.PlayerHorses[Bukkit.getPlayer("TTortel")]!!.location.add(0.0,0.0,0.0))
+                        println("teleporting ${entity.type}")
+                    }
+                }
             }
-        }.runTaskTimer(this, 1, 20)
+        }.runTaskTimer(this, 1, 1) // originally 20
     }
 
     fun setupTickSystem(){
         object : BukkitRunnable() {
             override fun run() {
                if (!RaceUtils.RaceStarted) return
-                for (plr in playersInRace) {
-                    if (VehicleUtils.getplrVehicle(plr) == null || VehicleUtils.PlayerHorses[plr] == null || VehicleUtils.PlayerArmorStands[plr] == null)
+                for (plr in PlayersInRace) {
+                    if (VehicleUtils.getplrVehicle(plr) == null || VehicleUtils.PlayerHorses[plr] == null || VehicleUtils.PlayerItemDisplays[plr] == null)
                         continue
 
                     val Horse = VehicleUtils.PlayerHorses[plr] ?: continue
-                    val ArmorStand = VehicleUtils.PlayerArmorStands[plr] ?: continue
+                    val ItemDisplay = VehicleUtils.PlayerItemDisplays[plr] ?: continue
                     val plrVRotation = VehicleUtils.PlayerRotations[plr] ?: continue
 
-                    if (!Horse.isValid || !ArmorStand.isValid){
+                    if (!Horse.isValid || !ItemDisplay.isValid){
                         println("WOOPSIES")
                         continue
                     }
@@ -145,9 +155,9 @@ class Main : JavaPlugin() {
                     Horse.setRotation(plrVRotation, 0.0f)
 
                     // ARMOR STAND
-                    ArmorStand.teleport(Horse)
+                    ItemDisplay.teleport(Horse)
 
-                    //println("Teleported ArmorStand to Horse at: ${Horse.location}")
+                    //println("Teleported ItemDisplay to Horse at: ${Horse.location}")
 
                     // DECELERATION
                     if (!VehicleUtils.PlayersAccelerating.contains(plr) && VehicleUtils.PlayersVelocities[plr]!! > 0.0) {

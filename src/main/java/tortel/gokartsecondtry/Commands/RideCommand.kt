@@ -9,7 +9,7 @@ import org.bukkit.Location
 import org.bukkit.entity.*
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
-import tortel.gokartsecondtry.Utils.VehicleUtils.PlayerArmorStands
+import tortel.gokartsecondtry.Utils.VehicleUtils.PlayerItemDisplays
 import tortel.gokartsecondtry.Utils.VehicleUtils.PlayerHorses
 import tortel.gokartsecondtry.Utils.VehicleUtils.getMobPlayerIsRiding
 
@@ -45,17 +45,17 @@ class RideCommand  { // : CommandExecutor
 
         PlayerHorses[plr] = Horse
 
-        val ArmorStand = plr.world.spawnEntity(plr.location, EntityType.ARMOR_STAND) as ArmorStand
-        //ArmorStand.isInvulnerable = true
-        // ArmorStand.isInvisible = false
-        // ArmorStand.isCustomNameVisible = false
-        // ArmorStand.setGravity(false)
-        //ArmorStand.isMarker = true
-       // ArmorStand.isSilent = true
-        // ArmorStand.isSmall = true
+        val ItemDisplay = plr.world.spawnEntity(plr.location, EntityType.ARMOR_STAND) as ItemDisplay
+        //ItemDisplay.isInvulnerable = true
+        // ItemDisplay.isInvisible = false
+        // ItemDisplay.isCustomNameVisible = false
+        // ItemDisplay.setGravity(false)
+        //ItemDisplay.isMarker = true
+       // ItemDisplay.isSilent = true
+        // ItemDisplay.isSmall = true
 
-         ArmorStand.addPassenger(plr)
-        // ArmorStand.customName(Component.text(plr.name))
+         ItemDisplay.addPassenger(plr)
+        // ItemDisplay.customName(Component.text(plr.name))
 
         /*
         Atest.isInvulnerable = true
@@ -67,10 +67,10 @@ class RideCommand  { // : CommandExecutor
          */
 
 
-        PlayerArmorStands[plr] = ArmorStand
+        PlayerItemDisplays[plr] = ItemDisplay
 
-        println(ArmorStand)
-        println(PlayerArmorStands[plr])
+        println(ItemDisplay)
+        println(PlayerItemDisplays[plr])
 
         //Vehicle.velocity = Vehicle.velocity.add(Vector(0.0,10.0,0.0))
 /*
@@ -249,17 +249,17 @@ class RideCommand  { // : CommandExecutor
 
         PlayerHorses[plr] = Horse
 
-        val ArmorStand = plr.world.spawnEntity(plr.location, EntityType.ARMOR_STAND) as ArmorStand
-        //ArmorStand.isInvulnerable = true
-        // ArmorStand.isInvisible = false
-        // ArmorStand.isCustomNameVisible = false
-        // ArmorStand.setGravity(false)
-        //ArmorStand.isMarker = true
-        // ArmorStand.isSilent = true
-        // ArmorStand.isSmall = true
+        val ItemDisplay = plr.world.spawnEntity(plr.location, EntityType.ARMOR_STAND) as ItemDisplay
+        //ItemDisplay.isInvulnerable = true
+        // ItemDisplay.isInvisible = false
+        // ItemDisplay.isCustomNameVisible = false
+        // ItemDisplay.setGravity(false)
+        //ItemDisplay.isMarker = true
+        // ItemDisplay.isSilent = true
+        // ItemDisplay.isSmall = true
 
-        ArmorStand.addPassenger(plr)
-        // ArmorStand.customName(Component.text(plr.name))
+        ItemDisplay.addPassenger(plr)
+        // ItemDisplay.customName(Component.text(plr.name))
 
         /*
         Atest.isInvulnerable = true
@@ -271,10 +271,10 @@ class RideCommand  { // : CommandExecutor
          */
 
 
-        PlayerArmorStands[plr] = ArmorStand
+        PlayerItemDisplays[plr] = ItemDisplay
 
-        println(ArmorStand)
-        println(PlayerArmorStands[plr])
+        println(ItemDisplay)
+        println(PlayerItemDisplays[plr])
 
         //Vehicle.velocity = Vehicle.velocity.add(Vector(0.0,10.0,0.0))
         /*

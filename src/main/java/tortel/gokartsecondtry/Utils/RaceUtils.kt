@@ -4,18 +4,25 @@ package tortel.gokartsecondtry.Utils
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import org.bukkit.scheduler.BukkitRunnable
+import org.bukkit.util.Vector
+import tortel.gokartsecondtry.Main
 import tortel.gokartsecondtry.Utils.RacingTracksConfigUtils.getTrackCoords
-import tortel.gokartsecondtry.Utils.VehicleUtils.despawnArmorStand
+import tortel.gokartsecondtry.Utils.VehicleUtils.PlayerHorses
+import tortel.gokartsecondtry.Utils.VehicleUtils.despawnItemDisplay
 import tortel.gokartsecondtry.Utils.VehicleUtils.despawnHorse
+import tortel.gokartsecondtry.Utils.VehicleUtils.despawnPigs
 import tortel.gokartsecondtry.Utils.VehicleUtils.resetAllValues
-import tortel.gokartsecondtry.Utils.VehicleUtils.spawnArmorStand
+import tortel.gokartsecondtry.Utils.VehicleUtils.spawnItemDisplay
 import tortel.gokartsecondtry.Utils.VehicleUtils.spawnHorse
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 object RaceUtils {
     var RaceStarted = false
 
-    val playersInRace = mutableListOf<Player>()
+    val PlayersInRace = mutableListOf<Player>()
 
     val RaceCoords = mapOf<String, Location>(
         "kartmap" to Location(Bukkit.getWorld("kartmap"), 123.5, 32.0, 10.5, 90F, 0F)
@@ -25,14 +32,18 @@ object RaceUtils {
 
     //TODO: CHANGE - or + depending on the map name
     fun setupAndStartRace(TrackName: String){
-        //teleporting players
-
+     
         if (!canSetup(TrackName)) return
         println("setting up the race")
         //setting up
         tpPlayerstoMap(TrackName)
 
-        spawnVehicles(TrackName)
+        object : BukkitRunnable() {
+            override fun run() {
+                spawnVehicles(TrackName)
+            }
+        }.runTaskLater(Main.instance!!, 5)
+
 
         //starting
         RaceStarted = true
@@ -77,7 +88,6 @@ object RaceUtils {
         }
 
         chosenPlayers.clear()
-        println("cleared chosen players")
         /*
 
         val coords = RaceCoords[raceName]!!
@@ -104,25 +114,27 @@ object RaceUtils {
         for (onlineplayer in Bukkit.getOnlinePlayers()) {
             //TODO: IF PLAYER IS READY FOR A RACE
             spawnHorse(TrackName, onlineplayer)
-            spawnArmorStand(TrackName, onlineplayer)
+            spawnItemDisplay(TrackName, onlineplayer)
 
-            playersInRace.add(onlineplayer)
+            PlayersInRace.add(onlineplayer)
         }
-        println("finished spawning everything , players in race : $playersInRace")
+        println("finished spawning everything , players in race : $PlayersInRace")
     }
     fun despawnVehicles(){
-        for (onlineplayer in playersInRace) {
+        for (onlineplayer in PlayersInRace) {
             despawnHorse(onlineplayer)
-            despawnArmorStand(onlineplayer)
+            despawnItemDisplay(onlineplayer)
+            despawnPigs(onlineplayer)
 
-            playersInRace.minus(onlineplayer)
+            PlayersInRace.minus(onlineplayer)
         }
         println("finished despawning everything")
     }
     fun canSetup(raceName : String) : Boolean{
         if (Bukkit.getWorld(raceName) == null) return false
         if (RaceCoords[raceName] == null) return false
-
+        if (!PlayerHorses.isEmpty()) return false
+        if (!PlayersInRace.isEmpty()) return false
         return true
     }
 }

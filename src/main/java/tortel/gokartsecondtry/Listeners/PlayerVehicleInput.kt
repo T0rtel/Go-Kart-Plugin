@@ -11,6 +11,7 @@ import tortel.gokartsecondtry.Utils.KeyListener.KeyPressEvent
 import tortel.gokartsecondtry.Utils.KeyListener.KeyReleaseEvent
 import tortel.gokartsecondtry.Utils.VehicleUtils
 import tortel.gokartsecondtry.Utils.VehicleUtils.ToggleAccelerate
+import tortel.gokartsecondtry.Utils.VehicleUtils.toggleBrakes
 import tortel.gokartsecondtry.Utils.VehicleUtils.toggleDrifting
 import tortel.gokartsecondtry.Utils.VehicleUtils.toggleSteerLeft
 import tortel.gokartsecondtry.Utils.VehicleUtils.toggleSteerRight
@@ -74,12 +75,16 @@ class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(
                 keyState.sPressed = newS
 
                 if (newS) {
+                    if (sidewardMovement != 0.0f){
+                        toggleDrifting(plr, sidewardMovement, true)
+                    }else{
+                        toggleBrakes(plr, true)
+                    }
 
-                    toggleDrifting(plr, sidewardMovement, true)
                 } else {
 
                     toggleDrifting(plr, sidewardMovement, false)
-
+                    toggleBrakes(plr, false)
                 }
             }
 
