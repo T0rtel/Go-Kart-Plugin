@@ -11,7 +11,6 @@ import tortel.gokartsecondtry.Utils.RacingTracksConfigUtils.getTrackCoords
 import tortel.gokartsecondtry.Utils.VehicleUtils.PlayerHorses
 import tortel.gokartsecondtry.Utils.VehicleUtils.despawnItemDisplay
 import tortel.gokartsecondtry.Utils.VehicleUtils.despawnHorse
-import tortel.gokartsecondtry.Utils.VehicleUtils.despawnPigs
 import tortel.gokartsecondtry.Utils.VehicleUtils.resetAllValues
 import tortel.gokartsecondtry.Utils.VehicleUtils.spawnItemDisplay
 import tortel.gokartsecondtry.Utils.VehicleUtils.spawnHorse
@@ -124,7 +123,7 @@ object RaceUtils {
         for (onlineplayer in PlayersInRace) {
             despawnHorse(onlineplayer)
             despawnItemDisplay(onlineplayer)
-            despawnPigs(onlineplayer)
+
 
             PlayersInRace.minus(onlineplayer)
         }

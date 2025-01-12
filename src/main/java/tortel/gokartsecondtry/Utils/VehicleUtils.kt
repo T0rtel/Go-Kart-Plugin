@@ -413,6 +413,7 @@ object VehicleUtils {
         ItemDisplay.teleportDuration = 1
         ItemDisplay.customName(Component.text(PlayerHorses[plr]!!.uniqueId.toString()))
         ItemDisplay.addScoreboardTag("needstotp")
+        ItemDisplay.addPassenger(plr)
         /*
         ItemDisplay.transformation = Transformation(
             Vector3f(0.0f, 0.5f, 0.0f),
@@ -431,19 +432,11 @@ object VehicleUtils {
 
         ItemDisplay.setItemStack(Item)
 
-        val anotherItemDisplay = Bukkit.getWorld(worldname)!!.spawnEntity(Location(plr.world,plr.location.x, plr.location.y, plr.location.z), EntityType.ITEM_DISPLAY) as ItemDisplay
-        val Itemm = ItemStack(Material.PAPER)
-        val metaa = Item.itemMeta
-        metaa.setCustomModelData(9)
-        Itemm.setItemMeta(meta)
-
-        anotherItemDisplay.setItemStack(Item)
-        ItemDisplay.addPassenger(anotherItemDisplay)
         //ItemDisplay.teleportAsync(plr.location.add(0.0,1.0,0.0))
 
         PlayerItemDisplays[plr] = ItemDisplay
 
-        //PlayerHorses[plr]!!.addPassenger(ItemDisplay)
+        PlayerHorses[plr]!!.addPassenger(ItemDisplay)
     }
 
 
@@ -486,8 +479,6 @@ object VehicleUtils {
                     val Velocity = PlayersVelocities[plr] ?: continue
 
                     if (Velocity < 0.0) { PlayersVelocities[plr] = 0.0 }
-
-
 
 
                     val radians = Math.toRadians(Horse.location.yaw.toDouble())
