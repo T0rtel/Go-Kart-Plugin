@@ -219,7 +219,7 @@ class RideCommand  { // : CommandExecutor
         return false
     }
      */
-    @Command("ride")
+   // @Command("ride")
     fun ride (sender : BukkitCommandActor){
         if (sender !is Player) return
         val plr = sender

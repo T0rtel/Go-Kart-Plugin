@@ -66,7 +66,7 @@ class Main : JavaPlugin() {
             .build()
 
         lamp.register(RaceCommand())
-        lamp.register(RideCommand())
+       // lamp.register(RideCommand())
         lamp.register(RacePosCommands())
         //getCommand("ride")?.setExecutor(RideCommand())
         //getCommand("race")?.setExecutor(RaceCommand())

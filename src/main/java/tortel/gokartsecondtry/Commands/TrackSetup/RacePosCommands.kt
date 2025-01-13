@@ -2,6 +2,7 @@ package tortel.gokartsecondtry.Commands.TrackSetup
 
 import org.bukkit.entity.Player
 import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Description
 import revxrsal.commands.annotation.Subcommand
 import revxrsal.commands.annotation.Suggest
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
@@ -10,6 +11,7 @@ import tortel.gokartsecondtry.data.RaceTracksConfig
 
 
 @Command("racepos")
+@Description("Sets the racers positions when race starts.")
 class RacePosCommands {
     @Subcommand("add")
     fun addRacePos(sender: Player, racerNumber : Int){

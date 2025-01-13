@@ -4,6 +4,7 @@ package tortel.gokartsecondtry.Commands
 
 import org.bukkit.entity.Player
 import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Description
 import revxrsal.commands.annotation.Suggest
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
 
@@ -27,6 +28,7 @@ class RaceCommand { //:CommandExecutor
     }
      */
     @Command("race")
+    @Description("Race command, spawns karts and lets you ride them, make sure to use /racepos before using this.")
     fun race(sender: Player, @Suggest("start", "stop") value : String, @Suggest("this") TrackName : String){ // , value : String
         if (!sender.isOp) return
         var track = TrackName
