@@ -4,6 +4,7 @@ package tortel.gokartsecondtry.Commands
 
 import org.bukkit.entity.Player
 import revxrsal.commands.annotation.Command
+import revxrsal.commands.annotation.Suggest
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
 
 import tortel.gokartsecondtry.Utils.RaceUtils
@@ -25,7 +26,7 @@ class RaceCommand { //:CommandExecutor
     }
      */
     @Command("race")
-    fun race(sender: Player, value : String, TrackName : String){ // , value : String
+    fun race(sender: Player, @Suggest("start", "stop") value : String, TrackName : String){ // , value : String
         if (!sender.isOp) return
         if (value == "start"){
             println("Track name is $TrackName")

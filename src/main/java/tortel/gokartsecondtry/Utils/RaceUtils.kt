@@ -44,6 +44,7 @@ object RaceUtils {
         }.runTaskLater(Main.instance!!, 5)
 
 
+
         //starting
         RaceStarted = true
 
@@ -67,9 +68,11 @@ object RaceUtils {
 
         var i = 1
         Bukkit.getOnlinePlayers().forEach { plr ->
+            val loc = getTrackCoords(TrackName, i)
             val players = Bukkit.getOnlinePlayers()
                 .filter { !chosenPlayers.contains(it.name) } // Exclude already chosen players
 
+            if (loc.world == null) return
             if (players.isEmpty()) return
 
             val selectedplr: Player = players.random()
@@ -78,7 +81,8 @@ object RaceUtils {
             //chosenPlayers += selectedplr.name
             chosenPlayers.add(selectedplr.name)
 
-            val loc = getTrackCoords(TrackName, i)
+
+
             //println("want to tp ${selectedplr.name} to ${loc.x} ${loc.y} ${loc.z} ${loc.pitch} in which his number is $i  player")
             //println(chosenPlayers)
             selectedplr.teleport(loc)

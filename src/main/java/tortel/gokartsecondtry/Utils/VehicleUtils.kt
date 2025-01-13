@@ -2,6 +2,7 @@ package tortel.gokartsecondtry.Utils
 
 
 import com.comphenix.protocol.PacketType.Play
+import io.papermc.paper.entity.TeleportFlag
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -41,7 +42,6 @@ object VehicleUtils {
     val PlayerItemDisplays = mutableMapOf<Player, Entity>()
     val PlayersDrifting = mutableListOf<Player>()
     val DriftingDir = mutableMapOf<Player, String>()
-    val PlayersTickDrifting = mutableMapOf<Player, Int>()
 
     val playerKeyStates = mutableMapOf<Player, KeyState>()
 
@@ -67,10 +67,12 @@ object VehicleUtils {
         if (accelerate){
             if (!PlayersAccelerating.contains(plr)){
                 PlayersAccelerating.add(plr)
+
             }
         }else{
             if (PlayersAccelerating.contains(plr)){
                 PlayersAccelerating.remove(plr)
+
             }
         }
         /*
@@ -191,12 +193,12 @@ object VehicleUtils {
         if (originalDriftingDir == "right"){
             if (right){
                // println("go in original dir")
-                Bukkit.broadcastMessage("not Wide angle drift")
+               // Bukkit.broadcastMessage("not Wide angle drift")
                 PlayerRotations[plr] = lastRot + MaxDriftingRotationSpeed
             }
             if (left){
                // println("go in NOT original dir")
-                Bukkit.broadcastMessage("Wide angle drift")
+               // Bukkit.broadcastMessage("Wide angle drift")
                 PlayerRotations[plr] = lastRot + MinDriftingRotationSpeed
             }
         }
@@ -204,12 +206,12 @@ object VehicleUtils {
         if (originalDriftingDir == "left"){
             if (left){
                // println("go in original dir")
-                Bukkit.broadcastMessage("not Wide angle drift")
+              //  Bukkit.broadcastMessage("not Wide angle drift")
                 PlayerRotations[plr] = lastRot - MaxDriftingRotationSpeed
             }
             if (right){
                // println("go in NOT original dir")
-                Bukkit.broadcastMessage("Wide angle drift")
+               // Bukkit.broadcastMessage("Wide angle drift")
                 PlayerRotations[plr] = lastRot - MinDriftingRotationSpeed
             }
         }
@@ -379,7 +381,10 @@ object VehicleUtils {
 
 
     fun spawnHorse(worldname : String, plr : Player){
-        val Horse = Bukkit.getWorld(worldname)!!.spawnEntity(Location(plr.world,plr.location.x, plr.location.y, plr.location.z), EntityType.HORSE) as Horse
+        val Horse = Bukkit.getWorld(worldname)!!
+            .spawnEntity(
+                Location(plr.world,plr.location.x, plr.location.y, plr.location.z, plr.location.yaw, plr.location.pitch),
+                EntityType.HORSE) as Horse
         Bukkit.getMobGoals().removeAllGoals(Horse)
         Horse.isInvulnerable = true
         Horse.isInvisible = false // TODO: REMOVE INVIS
@@ -396,8 +401,7 @@ object VehicleUtils {
         Horse.customName(Component.text(plr.name))
         //Horse.let { horse -> Bukkit.getMobGoals().removeAllGoals(horse)}
         Bukkit.getMobGoals().removeAllGoals(Horse)
-        Horse.setRotation(plr.location.yaw,0.0f)
-
+        //Horse.setRotation(0f,0.0f)
         //Horse.addPassenger(plr)
         PlayerHorses[plr] = Horse
     }
@@ -436,10 +440,15 @@ object VehicleUtils {
 
         PlayerItemDisplays[plr] = ItemDisplay
 
-        PlayerHorses[plr]!!.addPassenger(ItemDisplay)
+        //PlayerHorses[plr]!!.addPassenger(ItemDisplay)
     }
 
+    fun Particle(plr : Player, Horse : Entity){
+        val loc = Horse.location.add(0.0,1.0,0.0)
+        plr.world.spawnParticle(org.bukkit.Particle.DUST_PLUME, Horse.location, 50, 0.0, 0.1 ,0.0)
 
+        println("particles yay")
+    }
 
 
     fun despawnHorse(plr : Player){
@@ -489,11 +498,12 @@ object VehicleUtils {
                     val rightdriftingx = -sin(radians) * driftingforwardSpeed  - cos(radians)* driftingdiagonalOffset
                     val rightdriftingz = cos(radians) * driftingforwardSpeed - sin(radians)* driftingdiagonalOffset
 
-
+                    ItemDisplay.teleport(Horse.location.add(0.0,0.5,0.0), TeleportFlag.EntityState.RETAIN_PASSENGERS)
 
                     // VELOCITY
                     if (PlayersAccelerating.contains(plr)){
                         IncreaseVel(plr)
+                        Particle(plr, Horse)
                     }
                     if (PlayersBraking.contains(plr)){
                         Brake(plr)

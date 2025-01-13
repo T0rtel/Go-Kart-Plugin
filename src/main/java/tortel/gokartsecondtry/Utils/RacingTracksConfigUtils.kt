@@ -51,15 +51,20 @@ object RacingTracksConfigUtils {
         save()
     }
 
-    fun getTrackCoords(TrackName : String, i: Int) : Location{
+    fun getTrackCoords(TrackName : String, i: Int): Location {
         println("getting coords for ${TrackName} for playr in $i")
         val config = RaceTracksConfig.getConfig()
-        val x = config.getDouble("racetracks.$TrackName.$i.x") + 0.5
-        val y = config.getDouble("racetracks.$TrackName.$i.y")
-        val z = config.getDouble("racetracks.$TrackName.$i.z") + 0.5
-        val yaw = config.getDouble("racetracks.$TrackName.$i.yaw").toFloat()
-        val finalLoc = Location(Bukkit.getWorld(TrackName),x,y,z,yaw,0.0f)
-        return finalLoc
+        if (config.get("racetracks.$TrackName") != null){
+            val x = config.getDouble("racetracks.$TrackName.$i.x") + 0.5
+            val y = config.getDouble("racetracks.$TrackName.$i.y")
+            val z = config.getDouble("racetracks.$TrackName.$i.z") + 0.5
+            val yaw = config.getDouble("racetracks.$TrackName.$i.yaw").toFloat()
+            val finalLoc = Location(Bukkit.getWorld(TrackName),x,y,z,yaw,0.0f)
+            return finalLoc
+        }else{
+
+        }
+       return Location(null,0.0,0.0,0.0)
     }
 
     fun save(){
