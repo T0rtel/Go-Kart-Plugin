@@ -166,13 +166,14 @@ object RaceUtils {
         VehicleUtils.PlayerRotations.put(plr, 0.0f)
     }
     fun onPlayerLeaveGame(plr : Player){ // when player Disconnects
-        //TODO: REJOIN GAME
-        despawnVehicles(plr)
+        if (RaceStarted == true && PlayersInRace.contains(plr)){
+            //TODO: REJOIN GAME
+            despawnVehicles(plr)
 
-        VehicleUtils.PlayersVelocities.remove(plr)
-        VehicleUtils.PlayerRotations.remove(plr)
+            VehicleUtils.PlayersVelocities.remove(plr)
+            VehicleUtils.PlayerRotations.remove(plr)
 
-        stopRaceIfEmpty()
-
+            stopRaceIfEmpty()
+        }
     }
 }
