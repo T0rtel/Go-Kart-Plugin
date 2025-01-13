@@ -8,6 +8,7 @@ import revxrsal.commands.annotation.Suggest
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
 
 import tortel.gokartsecondtry.Utils.RaceUtils
+import javax.sound.midi.Track
 
 
 class RaceCommand { //:CommandExecutor
@@ -26,15 +27,19 @@ class RaceCommand { //:CommandExecutor
     }
      */
     @Command("race")
-    fun race(sender: Player, @Suggest("start", "stop") value : String, TrackName : String){ // , value : String
+    fun race(sender: Player, @Suggest("start", "stop") value : String, @Suggest("this") TrackName : String){ // , value : String
         if (!sender.isOp) return
+        var track = TrackName
         if (value == "start"){
-            println("Track name is $TrackName")
-            RaceUtils.setupAndStartRace(TrackName)
+            if (track == "this") {
+                track = sender.world.name
+            }
+            println("Track name is $track")
+            RaceUtils.setupAndStartRace(track)
         }
         if (value == "stop"){
             //TODO:STOP RACE AND STUFF
-            RaceUtils.stopRace(TrackName)
+            RaceUtils.stopRace(track)
         }
 
         return

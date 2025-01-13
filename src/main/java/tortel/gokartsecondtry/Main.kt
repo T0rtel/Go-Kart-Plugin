@@ -17,11 +17,9 @@ import tortel.gokartsecondtry.Commands.TrackSetup.RacePosCommands
 import tortel.gokartsecondtry.Listeners.*
 import tortel.gokartsecondtry.Utils.RaceUtils
 import tortel.gokartsecondtry.Utils.RaceUtils.PlayersInRace
-import tortel.gokartsecondtry.Utils.RacingTracksConfigUtils
 import tortel.gokartsecondtry.Utils.VehicleUtils
 import tortel.gokartsecondtry.data.RaceTracksConfig
 import java.io.File
-import java.util.*
 
 class Main : JavaPlugin() {
     val pluginmanager = Bukkit.getPluginManager()
@@ -57,7 +55,7 @@ class Main : JavaPlugin() {
     fun registerEvents(){
         protocolManager!!.addPacketListener(PlayerVehicleInput(this))
         //protocolManager!!.addPacketListener(UnHeldKeyEvent(this))
-        pluginmanager.registerEvents(PlayerJoinEvent(), this)
+        pluginmanager.registerEvents(PlayerJoinLeaveEvent(), this)
         pluginmanager.registerEvents(PlayerSpaceHeld(), this)
         pluginmanager.registerEvents(PlayerQuitVehicle(), this)
 

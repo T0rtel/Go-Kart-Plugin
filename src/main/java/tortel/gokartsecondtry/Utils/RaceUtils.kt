@@ -12,6 +12,7 @@ import tortel.gokartsecondtry.Utils.VehicleUtils.PlayerHorses
 import tortel.gokartsecondtry.Utils.VehicleUtils.despawnItemDisplay
 import tortel.gokartsecondtry.Utils.VehicleUtils.despawnHorse
 import tortel.gokartsecondtry.Utils.VehicleUtils.resetAllValues
+import tortel.gokartsecondtry.Utils.VehicleUtils.resetValues
 import tortel.gokartsecondtry.Utils.VehicleUtils.spawnItemDisplay
 import tortel.gokartsecondtry.Utils.VehicleUtils.spawnHorse
 import kotlin.math.cos
@@ -55,12 +56,21 @@ object RaceUtils {
 
     fun stopRace(RaceName : String){
         //TODO: IMPLEMENT
-        //stopping
         RaceStarted = false
 
         despawnVehicles()
-        resetAllValues()
+        //resetAllValues()
         println("stopped race")
+
+    }
+    fun stopRaceIfEmpty(){
+        if (PlayersInRace.size == 0){
+            RaceStarted = false
+
+            despawnVehicles()
+            //resetAllValues()
+            println("stopped race")
+        }
     }
 
     fun tpPlayerstoMap(TrackName: String){
@@ -128,10 +138,20 @@ object RaceUtils {
             despawnHorse(onlineplayer)
             despawnItemDisplay(onlineplayer)
 
+            resetValues(onlineplayer)
 
             PlayersInRace.minus(onlineplayer)
         }
         println("finished despawning everything")
+    }
+    fun despawnVehicles(plr : Player){
+        despawnHorse(plr)
+        despawnItemDisplay(plr)
+
+
+        PlayersInRace.minus(plr)
+
+        println("finished despawning vehicle for ${plr.name}")
     }
     fun canSetup(raceName : String) : Boolean{
         if (Bukkit.getWorld(raceName) == null) return false
@@ -139,5 +159,20 @@ object RaceUtils {
         if (!PlayerHorses.isEmpty()) return false
         if (!PlayersInRace.isEmpty()) return false
         return true
+    }
+
+    fun onPlayerEnterGame(plr : Player){ // when player connects
+        VehicleUtils.PlayersVelocities.put(plr, 0.0)
+        VehicleUtils.PlayerRotations.put(plr, 0.0f)
+    }
+    fun onPlayerLeaveGame(plr : Player){ // when player Disconnects
+        //TODO: REJOIN GAME
+        despawnVehicles(plr)
+
+        VehicleUtils.PlayersVelocities.remove(plr)
+        VehicleUtils.PlayerRotations.remove(plr)
+
+        stopRaceIfEmpty()
+
     }
 }

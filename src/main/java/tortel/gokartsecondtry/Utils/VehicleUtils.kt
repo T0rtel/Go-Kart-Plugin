@@ -1,7 +1,6 @@
 package tortel.gokartsecondtry.Utils
 
 
-import com.comphenix.protocol.PacketType.Play
 import io.papermc.paper.entity.TeleportFlag
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -10,14 +9,10 @@ import org.bukkit.Material
 import org.bukkit.entity.*
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
-import org.bukkit.util.Transformation
 import org.bukkit.util.Vector
-import org.joml.AxisAngle4f
-import org.joml.Vector3f
 import tortel.gokartsecondtry.Main
 import tortel.gokartsecondtry.Utils.RaceUtils.RaceStarted
 import tortel.gokartsecondtry.Utils.RaceUtils.PlayersInRace
-import kotlin.math.absoluteValue
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -52,6 +47,7 @@ object VehicleUtils {
     val MaxSpeed = 0.8 // 0.8 * 20 = 16 blocks/second
     val MaxRotationSpeed = 3f
     val bouncePower = -2.5
+    val GravityValue = -2.5
 
     //drifting
     val driftingforwardSpeed = 1 // Increased forward speed
@@ -61,6 +57,7 @@ object VehicleUtils {
     val MaxDriftingRotationSpeed = 6f
     val MinDriftingRotationSpeed = 4f
     val MaxDriftingSpeed = 0.5
+    val MinSpeedToStartDrifting = 0.03 // half the maxspeed
 
     //TODO: ADD NEW ROTATION VARIABLE, CHANGE FROM vehicle.velocity TO vehicle.setdeltaspeed or some shi
     fun ToggleAccelerate(plr: Player, accelerate : Boolean){
@@ -154,7 +151,7 @@ object VehicleUtils {
     fun toggleDrifting(plr : Player, sides : Float, drift : Boolean){
         val lastRot = PlayerRotations[plr]!!
 
-        if (drift && sides != 0.0f){
+        if (drift && sides != 0.0f && PlayersVelocities[plr]!! > MinSpeedToStartDrifting){
             if (!PlayersDrifting.contains(plr)){
                 PlayersDrifting.add(plr)
                 if (sides == -0.98f){
@@ -387,7 +384,7 @@ object VehicleUtils {
                 EntityType.HORSE) as Horse
         Bukkit.getMobGoals().removeAllGoals(Horse)
         Horse.isInvulnerable = true
-        Horse.isInvisible = false // TODO: REMOVE INVIS
+        Horse.isInvisible = true
         Horse.isCustomNameVisible = false
         Horse.setNoPhysics(false)
         Horse.setGravity(true)
@@ -443,11 +440,16 @@ object VehicleUtils {
         //PlayerHorses[plr]!!.addPassenger(ItemDisplay)
     }
 
-    fun Particle(plr : Player, Horse : Entity){
-        val loc = Horse.location.add(0.0,1.0,0.0)
-        plr.world.spawnParticle(org.bukkit.Particle.DUST_PLUME, Horse.location, 50, 0.0, 0.1 ,0.0)
+    fun Particle(Vehicle : Entity){
+        val blockBelow = Vehicle.location.subtract(0.0, 1.0, 0.0).block
+        val particleLoc = Vehicle.location.add(-Vehicle.location.direction.x,0.0,-Vehicle.location.direction.z)
 
-        println("particles yay")
+        val particleData = blockBelow.blockData
+        Vehicle.world.spawnParticle(org.bukkit.Particle.BLOCK, particleLoc, 25, 0.35, 0.1, 0.35, particleData)
+
+        //plr.world.spawnParticle(org.bukkit.Particle.DUST_PLUME, Horse.location, 50, 0.0, 0.1 ,0.0)
+
+
     }
 
 
@@ -474,6 +476,11 @@ object VehicleUtils {
         }
     }
 
+    fun resetValues(plr : Player){
+        PlayersVelocities[plr] = 0.0
+        PlayerRotations[plr] = 0.0f
+    }
+
     fun startRaceTicking(){
         object : BukkitRunnable() {
             override fun run() {
@@ -498,12 +505,12 @@ object VehicleUtils {
                     val rightdriftingx = -sin(radians) * driftingforwardSpeed  - cos(radians)* driftingdiagonalOffset
                     val rightdriftingz = cos(radians) * driftingforwardSpeed - sin(radians)* driftingdiagonalOffset
 
-                    ItemDisplay.teleport(Horse.location.add(0.0,0.5,0.0), TeleportFlag.EntityState.RETAIN_PASSENGERS)
+
 
                     // VELOCITY
                     if (PlayersAccelerating.contains(plr)){
                         IncreaseVel(plr)
-                        Particle(plr, Horse)
+                        Particle(Horse)
                     }
                     if (PlayersBraking.contains(plr)){
                         Brake(plr)
@@ -511,6 +518,7 @@ object VehicleUtils {
                     if (PlayersDrifting.contains(plr)){
                         //TODO: ADD DRIFTING
                         drift(plr, playerKeyStates.get(plr)!!)
+                        Particle(Horse)
                     }
                     if (PlayersSteeringLeft.contains(plr)){
                         SteerLeft(plr)
@@ -522,7 +530,8 @@ object VehicleUtils {
                     // ROTATION
 
                     Horse.setRotation(plryawRotation, 0.0f)
-                    ItemDisplay.setRotation(plryawRotation, 0.0f)
+                    ItemDisplay.teleport(Horse.location.add(0.0,0.5,0.0), TeleportFlag.EntityState.RETAIN_PASSENGERS)
+                    //ItemDisplay.setRotation(plryawRotation, 0.0f)
 
 
                     //FORCES
@@ -530,14 +539,14 @@ object VehicleUtils {
                         if (DriftingDir[plr] == "left") {
 
                             Horse.velocity = Vector(rightdriftingx, 0.5, rightdriftingz).multiply(
-                                Vector(Velocity, -5.0, Velocity)
+                                Vector(Velocity, GravityValue, Velocity)
                             )
 
 
                         }else if (DriftingDir[plr] == "right") {
 
                             Horse.velocity = Vector(leftdriftingx, 0.5, leftdriftingz).multiply(
-                                Vector(Velocity, -5.0, Velocity)
+                                Vector(Velocity, GravityValue, Velocity)
                             )
 
                         }
@@ -545,7 +554,7 @@ object VehicleUtils {
                     }
                     if (!PlayersDrifting.contains(plr)){ // PlayersAccelerating.contains(plr) &&
                         Horse.velocity = Vector(Horse.location.direction.x, 0.5, Horse.location.direction.z).multiply(
-                            Vector(Velocity, -5.0, Velocity)
+                            Vector(Velocity, GravityValue, Velocity)
                         )
                     }//w
 
