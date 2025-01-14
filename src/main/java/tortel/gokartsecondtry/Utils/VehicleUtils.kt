@@ -177,6 +177,7 @@ object VehicleUtils {
             }
         }
     }
+    //TODO: FIX LETTING GO IF ANY OF DIRECTION KEYS(S/D) IT DOESNT STOP DRIFTINMG
     fun drift(plr : Player, KeyStates: KeyState){
         val originalDriftingDir = DriftingDir[plr]
         val right = KeyStates.dPressed

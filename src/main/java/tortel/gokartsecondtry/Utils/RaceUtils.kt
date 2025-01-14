@@ -24,9 +24,6 @@ object RaceUtils {
 
     val PlayersInRace = mutableListOf<Player>()
 
-    val RaceCoords = mapOf<String, Location>(
-        "kartmap" to Location(Bukkit.getWorld("kartmap"), 123.5, 32.0, 10.5, 90F, 0F)
-    )
 
     var chosenPlayers = mutableListOf<String>()
 
@@ -155,9 +152,9 @@ object RaceUtils {
     }
     fun canSetup(raceName : String) : Boolean{
         if (Bukkit.getWorld(raceName) == null) return false
-        if (RaceCoords[raceName] == null) return false
-        if (!PlayerHorses.isEmpty()) return false
-        if (!PlayersInRace.isEmpty()) return false
+        if (RaceStarted) return false // race already going on
+        //if (!PlayerHorses.isEmpty()) return false
+        //if (!PlayersInRace.isEmpty()) return false
         return true
     }
 
