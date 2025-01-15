@@ -54,19 +54,20 @@ object RaceUtils {
     fun stopRace(RaceName : String){
         //TODO: IMPLEMENT
         RaceStarted = false
+        println("Stopping race function")
 
         despawnVehicles()
         //resetAllValues()
-        println("stopped race")
+        println("finished despawnvehciles()")
 
     }
     fun stopRaceIfEmpty(){
         if (PlayersInRace.size == 0){
             RaceStarted = false
-
+            //println("$PlayersInRace ")
             despawnVehicles()
             //resetAllValues()
-            println("stopped race")
+            println("stopped race2")
         }
     }
 
@@ -131,22 +132,23 @@ object RaceUtils {
         println("finished spawning everything , players in race : $PlayersInRace")
     }
     fun despawnVehicles(){
+        println("despawning ALL vehicles")
         for (onlineplayer in PlayersInRace) {
             despawnHorse(onlineplayer)
             despawnItemDisplay(onlineplayer)
 
-            resetValues(onlineplayer)
-
-            PlayersInRace.minus(onlineplayer)
         }
-        println("finished despawning everything")
+        resetAllValues()
+        println("finished despawning all karts")
     }
-    fun despawnVehicles(plr : Player){
+    fun despawnVehiclesForPlayer(plr : Player){
         despawnHorse(plr)
         despawnItemDisplay(plr)
 
 
-        PlayersInRace.minus(plr)
+        resetValues(plr)
+
+        //PlayersInRace.minus(plr)
 
         println("finished despawning vehicle for ${plr.name}")
     }
@@ -165,7 +167,7 @@ object RaceUtils {
     fun onPlayerLeaveGame(plr : Player){ // when player Disconnects
         if (RaceStarted == true && PlayersInRace.contains(plr)){
             //TODO: REJOIN GAME
-            despawnVehicles(plr)
+            despawnVehiclesForPlayer(plr)
 
             VehicleUtils.PlayersVelocities.remove(plr)
             VehicleUtils.PlayerRotations.remove(plr)

@@ -47,8 +47,8 @@ class Main : JavaPlugin() {
 
     override fun onDisable() {
         // Plugin shutdown logic
-        onDisablelogic()
-        setupConfigsOnDisable()
+        //onDisablelogic()
+        saveConfigsOnDisable()
         RaceUtils.stopRace("whateva")
     }
 
@@ -82,7 +82,7 @@ class Main : JavaPlugin() {
         logger.info("Configs Setup!")
     }
 
-    private fun setupConfigsOnDisable() {
+    private fun saveConfigsOnDisable() {
         RaceTracksConfig.save()
 
 
@@ -91,6 +91,7 @@ class Main : JavaPlugin() {
 
     fun onDisablelogic(){
         //remove all horses
+        
         VehicleUtils.PlayerHorses.forEach {
             val Entity = it.value
             val player = it.key
@@ -107,6 +108,7 @@ class Main : JavaPlugin() {
             Entity.remove()
             VehicleUtils.PlayerItemDisplays.remove(player)
         }
+        
 
     }
 
@@ -126,6 +128,8 @@ class Main : JavaPlugin() {
             }
         }.runTaskTimer(this, 1, 1) // originally 20
     }
+
+    /*
 
     fun setupTickSystem(){
         object : BukkitRunnable() {
@@ -170,4 +174,6 @@ class Main : JavaPlugin() {
         }.runTaskTimer(this, 1, 1)
 
     }
+     */
+
 }

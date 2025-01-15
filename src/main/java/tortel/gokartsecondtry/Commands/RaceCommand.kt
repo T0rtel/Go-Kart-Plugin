@@ -41,6 +41,7 @@ class RaceCommand { //:CommandExecutor
         }
         if (value == "stop"){
             //TODO:STOP RACE AND STUFF
+            println("sotting race here")
             RaceUtils.stopRace(track)
         }
 

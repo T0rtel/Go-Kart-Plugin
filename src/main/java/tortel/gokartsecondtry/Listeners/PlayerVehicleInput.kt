@@ -6,6 +6,7 @@ import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
 import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
+import org.bukkit.util.Vector
 import tortel.gokartsecondtry.Main
 import tortel.gokartsecondtry.Utils.KeyListener.KeyPressEvent
 import tortel.gokartsecondtry.Utils.KeyListener.KeyReleaseEvent
