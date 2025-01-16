@@ -391,7 +391,8 @@ object VehicleUtils {
         }
 
     }
-
+    //TODO: FIX SHIFTING BEFORE GAME START LETS YOU OFF IT
+    //TODO: FIX SHIFT + LEFT/RIGHT CLICK THE KART LETS YOU OFF IT
     fun spawnHorse(worldname : String, plr : Player){
         val Horse = Bukkit.getWorld(worldname)!!
             .spawnEntity(
