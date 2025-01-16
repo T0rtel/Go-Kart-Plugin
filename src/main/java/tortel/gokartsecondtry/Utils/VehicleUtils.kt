@@ -399,7 +399,7 @@ object VehicleUtils {
                 EntityType.HORSE) as Horse
         Bukkit.getMobGoals().removeAllGoals(Horse)
         Horse.isInvulnerable = true
-        Horse.isInvisible = false // TODO: MAKE IT INVIS
+        Horse.isInvisible = true // TODO: MAKE IT INVIS
         Horse.isCustomNameVisible = false
         Horse.setNoPhysics(false)
         Horse.setGravity(true)
