@@ -404,6 +404,9 @@ object VehicleUtils {
         Horse.isCustomNameVisible = false
         Horse.setNoPhysics(false)
         Horse.setGravity(true)
+        Horse.isCollidable = false
+        Horse.isPersistent = true
+        Horse.removeWhenFarAway = false
 
         Horse.setBaby()
         Horse.isTamed = true

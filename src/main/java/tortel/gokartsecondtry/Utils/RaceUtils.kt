@@ -35,16 +35,13 @@ object RaceUtils {
         //setting up
         tpPlayerstoMap(TrackName)
 
+        RaceStarted = true
+
         object : BukkitRunnable() {
             override fun run() {
                 spawnVehicles(TrackName)
             }
         }.runTaskLater(Main.instance!!, 5)
-
-
-
-        //starting
-        RaceStarted = true
 
         //VehicleUtils.startRaceTicking()
 

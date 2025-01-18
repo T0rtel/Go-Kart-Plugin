@@ -58,6 +58,7 @@ class Main : JavaPlugin() {
         pluginmanager.registerEvents(PlayerJoinLeaveEvent(), this)
         pluginmanager.registerEvents(PlayerSpaceHeld(), this)
         pluginmanager.registerEvents(PlayerQuitVehicle(), this)
+        pluginmanager.registerEvents(PlayerPunchEntityEvent(), this)
 
     }
 
