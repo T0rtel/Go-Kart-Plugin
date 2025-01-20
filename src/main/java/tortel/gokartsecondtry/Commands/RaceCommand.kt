@@ -30,7 +30,8 @@ class RaceCommand { //:CommandExecutor
     @Command("race")
     @Description("Race command, spawns karts and lets you ride them, make sure to use /racepos before using this.")
     fun race(sender: Player, @Suggest("start", "stop") value : String, @Suggest("this") TrackName : String){ // , value : String
-        if (!sender.isOp) return
+        if (!sender.isOp) return // TODO: IF PLAYER IS IN RACE DONT LET HIM GO TO GARAGE
+        //TODO: FIGURE OUT HOW TO SETUP MULTIPLE RACES THAT CAN RUN IN THE SAME TIME
         var track = TrackName
         if (value == "start"){
             if (track == "this") {
