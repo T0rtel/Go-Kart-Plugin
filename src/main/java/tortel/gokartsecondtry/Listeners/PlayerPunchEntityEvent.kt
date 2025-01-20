@@ -1,29 +1,18 @@
 package tortel.gokartsecondtry.Listeners
 
+import org.bukkit.entity.EntityType
 import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.event.player.PlayerQuitEvent
-import org.bukkit.event.player.PlayerToggleSneakEvent
-import tortel.gokartsecondtry.Utils.RaceUtils
-import tortel.gokartsecondtry.Utils.VehicleUtils
 
-class PlayerPunchEntityEvent : Listener {
-
+class PlayerPunchEntityEvent : org.bukkit.event.Listener {
     @EventHandler
-    fun onPunch(event : PlayerMoveEvent){
+    fun onInteract(event : PlayerInteractEntityEvent){
         val plr = event.player
-       // println("${event.player} ${event.eventName} ${event.player.isInsideVehicle} ${event.player.isSneaking}")
-        if (RaceUtils.RaceStarted){
-            if (!plr.isInsideVehicle && RaceUtils.PlayersInRace.contains(plr)){
-                VehicleUtils.PlayerItemDisplays[plr]!!.addPassenger(plr)
-                println("player got off vehicle")
-            }
-
+        val entity = event.rightClicked
+        if (entity.type == EntityType.INTERACTION){
+            println(entity.scoreboardTags)
         }
-    }
 
+    }
 }

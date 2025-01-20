@@ -7,21 +7,20 @@ import org.bukkit.entity.EntityType
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
-import org.bukkit.util.Vector
 import revxrsal.commands.Lamp
 import revxrsal.commands.bukkit.BukkitLamp
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
+import tortel.gokartsecondtry.Commands.GarageCommand
 import tortel.gokartsecondtry.Commands.RaceCommand
-import tortel.gokartsecondtry.Commands.RideCommand
 import tortel.gokartsecondtry.Commands.TrackSetup.RacePosCommands
 import tortel.gokartsecondtry.Listeners.*
 import tortel.gokartsecondtry.Utils.RaceUtils
-import tortel.gokartsecondtry.Utils.RaceUtils.PlayersInRace
 import tortel.gokartsecondtry.Utils.VehicleUtils
 import tortel.gokartsecondtry.data.RaceTracksConfig
 import java.io.File
 
 class Main : JavaPlugin() {
+
     val pluginmanager = Bukkit.getPluginManager()
     private var protocolManager: ProtocolManager? = null
     companion object {
@@ -58,6 +57,7 @@ class Main : JavaPlugin() {
         pluginmanager.registerEvents(PlayerJoinLeaveEvent(), this)
         pluginmanager.registerEvents(PlayerSpaceHeld(), this)
         pluginmanager.registerEvents(PlayerQuitVehicle(), this)
+        pluginmanager.registerEvents(PlayerMoveEvent(), this)
         pluginmanager.registerEvents(PlayerPunchEntityEvent(), this)
 
     }
@@ -67,6 +67,7 @@ class Main : JavaPlugin() {
             .build()
 
         lamp.register(RaceCommand())
+        lamp.register(GarageCommand())
        // lamp.register(RideCommand())
         lamp.register(RacePosCommands())
         //getCommand("ride")?.setExecutor(RideCommand())
@@ -85,9 +86,9 @@ class Main : JavaPlugin() {
 
     private fun saveConfigsOnDisable() {
         RaceTracksConfig.save()
+        this.saveConfig()
 
-
-        logger.info("Configs Saved! ")
+        logger.info("Configs Saved!")
     }
 
     fun onDisablelogic(){

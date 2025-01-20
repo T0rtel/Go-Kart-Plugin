@@ -424,8 +424,8 @@ object VehicleUtils {
 
     fun spawnItemDisplay(worldname: String, plr : Player){
         val ItemDisplay = Bukkit.getWorld(worldname)!!.spawnEntity(Location(plr.world,plr.location.x, plr.location.y, plr.location.z), EntityType.ITEM_DISPLAY) as ItemDisplay
-        //ItemDisplay.isInvulnerable = true
 
+        ItemDisplay.isInvulnerable = true
         ItemDisplay.setNoPhysics(true)
         ItemDisplay.setGravity(false)
         ItemDisplay.teleportDuration = 1
@@ -442,10 +442,7 @@ object VehicleUtils {
 
          */
 
-        val Item = ItemStack(Material.PAPER)
-        val meta = Item.itemMeta
-        meta.setCustomModelData(9)
-        Item.setItemMeta(meta)
+        val Item = CONSTANTS.getMainkart()
 
 
         ItemDisplay.setItemStack(Item)
@@ -590,7 +587,7 @@ object VehicleUtils {
                     // ROTATION
 
                     Horse.setRotation(plryawRotation, 0.0f)
-                    ItemDisplay.teleport(Horse.location.add(0.0,0.5,0.0), TeleportFlag.EntityState.RETAIN_PASSENGERS)
+                    ItemDisplay.teleport(Horse.location.add(CONSTANTS.KartOffset), TeleportFlag.EntityState.RETAIN_PASSENGERS)
 
 
 
