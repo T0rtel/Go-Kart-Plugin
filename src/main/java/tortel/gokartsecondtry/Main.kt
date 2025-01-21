@@ -2,8 +2,14 @@ package tortel.gokartsecondtry
 
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.ProtocolManager
+import com.hakan.core.HCore
+import com.mongodb.Mongo
+import com.mongodb.client.MongoDatabase
+import lombok.Getter
+import org.bson.Document
 import org.bukkit.Bukkit
 import org.bukkit.entity.EntityType
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
@@ -17,23 +23,35 @@ import tortel.gokartsecondtry.Listeners.*
 import tortel.gokartsecondtry.Utils.RaceUtils
 import tortel.gokartsecondtry.Utils.VehicleUtils
 import tortel.gokartsecondtry.data.RaceTracksConfig
+import tortel.gokartsecondtry.data.database.MongoDb
 import java.io.File
 
 class Main : JavaPlugin() {
 
     val pluginmanager = Bukkit.getPluginManager()
     private var protocolManager: ProtocolManager? = null
+
     companion object {
         var dataFolderDir: File = File("")
             private set
-        var instance : Plugin? = null
+        var instance: JavaPlugin? = null
+            private set
+        var mongoDb: MongoDatabase? = null
             private set
     }//test
 
     override fun onEnable() {
+        instance = this
+        //HCore.initialize(this)
         protocolManager = ProtocolLibrary.getProtocolManager()
         dataFolderDir = dataFolder
-        instance = this
+        try {
+            mongoDb = MongoDb.SetupDB("playerData","accounts") // mongodb+srv://admin:HtKyprc87BMYKRCo4rTrG3eMECjqdS@clobnet.ucuwlbq.mongodb.net/
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        println("PROFILES : ${MongoDb.getCollection("accounts").find().first()}")
 
         setupConfigsOnEnable()
         registerEvents()
@@ -41,6 +59,7 @@ class Main : JavaPlugin() {
         VehicleUtils.startRaceTicking()
         //setupConfigTickSystem()
         //setupTickSystem()
+
         logger.info("GoKart Plugin Enabled!")
     }
 
