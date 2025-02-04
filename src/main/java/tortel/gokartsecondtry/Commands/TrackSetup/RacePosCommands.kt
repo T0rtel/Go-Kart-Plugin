@@ -4,10 +4,7 @@ import org.bukkit.entity.Player
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Description
 import revxrsal.commands.annotation.Subcommand
-import revxrsal.commands.annotation.Suggest
-import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import tortel.gokartsecondtry.Utils.RacingTracksConfigUtils
-import tortel.gokartsecondtry.data.RaceTracksConfig
 
 
 @Command("racepos")

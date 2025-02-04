@@ -70,7 +70,7 @@ class Main : JavaPlugin() {
         RaceUtils.stopRace("whateva")
     }
 
-    fun registerEvents(){
+    private fun registerEvents(){
         protocolManager!!.addPacketListener(PlayerVehicleInput(this))
         //protocolManager!!.addPacketListener(UnHeldKeyEvent(this))
         pluginmanager.registerEvents(PlayerJoinLeaveEvent(), this)
@@ -81,7 +81,7 @@ class Main : JavaPlugin() {
 
     }
 
-    fun registerCommands(plugin: JavaPlugin){
+    private fun registerCommands(plugin: JavaPlugin){
         val lamp: Lamp<BukkitCommandActor> = BukkitLamp.builder(plugin)
             .build()
 
