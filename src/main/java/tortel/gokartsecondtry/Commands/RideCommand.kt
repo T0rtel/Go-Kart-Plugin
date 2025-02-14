@@ -271,7 +271,7 @@ class RideCommand  { // : CommandExecutor
          */
 
 
-        PlayerItemDisplays[plr] = ItemDisplay
+        //PlayerItemDisplays[plr] = ItemDisplay
 
         println(ItemDisplay)
         println(PlayerItemDisplays[plr])

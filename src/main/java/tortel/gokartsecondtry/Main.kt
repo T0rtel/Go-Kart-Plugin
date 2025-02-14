@@ -2,15 +2,10 @@ package tortel.gokartsecondtry
 
 import com.comphenix.protocol.ProtocolLibrary
 import com.comphenix.protocol.ProtocolManager
-import com.hakan.core.HCore
-import com.mongodb.Mongo
+
 import com.mongodb.client.MongoDatabase
-import lombok.Getter
-import org.bson.Document
 import org.bukkit.Bukkit
 import org.bukkit.entity.EntityType
-import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
 import revxrsal.commands.Lamp
@@ -41,17 +36,22 @@ class Main : JavaPlugin() {
     }//test
 
     override fun onEnable() {
+
+
         instance = this
-        //HCore.initialize(this)
         protocolManager = ProtocolLibrary.getProtocolManager()
         dataFolderDir = dataFolder
+        /*
+
         try {
             mongoDb = MongoDb.SetupDB("playerData","accounts") // mongodb+srv://admin:HtKyprc87BMYKRCo4rTrG3eMECjqdS@clobnet.ucuwlbq.mongodb.net/
         } catch (e: Exception) {
             e.printStackTrace()
         }
+         */
 
-        println("PROFILES : ${MongoDb.getCollection("accounts").find().first()}")
+
+        //println("PROFILES : ${MongoDb.getCollection("accounts").find().first()}")
 
         setupConfigsOnEnable()
         registerEvents()
@@ -123,10 +123,12 @@ class Main : JavaPlugin() {
 
         //remove all horses
         VehicleUtils.PlayerItemDisplays.forEach {
-            val Entity = it.value
+            val Entities = it.value
             val player = it.key
 
-            Entity.remove()
+            for (entity in Entities) {
+                entity.remove()
+            }
             VehicleUtils.PlayerItemDisplays.remove(player)
         }
         

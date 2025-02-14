@@ -14,7 +14,7 @@ class PlayerMoveEvent : Listener {
        // println("${event.player} ${event.eventName} ${event.player.isInsideVehicle} ${event.player.isSneaking}")
         if (RaceUtils.RaceStarted){
             if (!plr.isInsideVehicle && RaceUtils.PlayersInRace.contains(plr)){
-                VehicleUtils.PlayerItemDisplays[plr]!!.addPassenger(plr)
+                VehicleUtils.PlayerItemDisplays[plr]!![0].addPassenger(plr)
                 println("player got off vehicle")
             }
 

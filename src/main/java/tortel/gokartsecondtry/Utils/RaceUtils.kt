@@ -2,21 +2,16 @@ package tortel.gokartsecondtry.Utils
 
 
 import org.bukkit.Bukkit
-import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
-import org.bukkit.util.Vector
 import tortel.gokartsecondtry.Main
 import tortel.gokartsecondtry.Utils.RacingTracksConfigUtils.getTrackCoords
-import tortel.gokartsecondtry.Utils.VehicleUtils.PlayerHorses
 import tortel.gokartsecondtry.Utils.VehicleUtils.despawnItemDisplay
 import tortel.gokartsecondtry.Utils.VehicleUtils.despawnHorse
 import tortel.gokartsecondtry.Utils.VehicleUtils.resetAllValues
 import tortel.gokartsecondtry.Utils.VehicleUtils.resetValues
 import tortel.gokartsecondtry.Utils.VehicleUtils.spawnItemDisplay
 import tortel.gokartsecondtry.Utils.VehicleUtils.spawnHorse
-import kotlin.math.cos
-import kotlin.math.sin
 
 
 object RaceUtils {

@@ -1,26 +1,21 @@
 package tortel.gokartsecondtry.data.database
 
-import com.hakan.core.HCore
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
-import com.mongodb.WriteConcern
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.ReplaceOptions
-import com.mongodb.connection.ConnectionPoolSettings
-import lombok.Getter
 import org.bson.Document
-import org.bukkit.event.player.PlayerJoinEvent
 import tortel.gokartsecondtry.Main
 
 
 object MongoDb : AutoCloseable {
 
-    @Getter
+
     var playerProfilesCollection: MongoCollection<Document>? = null
-    @Getter
+
     var connected: Boolean = false
 
     private lateinit var mongoClient: MongoClient
@@ -32,15 +27,18 @@ object MongoDb : AutoCloseable {
 
 
     private fun connect(databaseName: String? = null, collectionName: String? = null): MongoDatabase {
-        val connectionString = String.format("mongodb+srv://admin:HtKyprc87BMYKRCo4rTrG3eMECjqdS@clobnet.ucuwlbq.mongodb.net/") //mongodb+srv://admin:HtKyprc87BMYKRCo4rTrG3eMECjqdS@clobnet.ucuwlbq.mongodb.net/
+        val connectionString = "mongodb+srv://admin:HtKyprc87BMYKRCo4rTrG3eMECjqdS@clobnet.ucuwlbq.mongodb.net/"
         val connString = ConnectionString(connectionString)
         val clientSettings = MongoClientSettings.builder()
             .applyConnectionString(connString)
+            .build()
+            /*
             .writeConcern(WriteConcern.ACKNOWLEDGED)
             .applyToConnectionPoolSettings { builder: ConnectionPoolSettings.Builder ->
                 builder.maxSize(100).minSize(10)
             }
-            .build()
+             */
+
 
         this.mongoClient = MongoClients.create(clientSettings)
         val database = mongoClient.getDatabase(databaseName!!)
@@ -76,14 +74,12 @@ object MongoDb : AutoCloseable {
 
     fun saveProfile(PlayerId: String?, document: Document?) {
         require(!isNotConnected()) { "MongoDB is not connected!" }
-        HCore.asyncScheduler().run(Runnable {
-            playerProfilesCollection!!.replaceOne(
-                Document(
-                    "_id",
-                    PlayerId
-                ), document, ReplaceOptions().upsert(true)
-            )
-        })
+        playerProfilesCollection!!.replaceOne(
+            Document(
+                "_id",
+                PlayerId
+            ), document, ReplaceOptions().upsert(true)
+        )
     }
 
     fun loadProfile(documentID: String?): Document? {
