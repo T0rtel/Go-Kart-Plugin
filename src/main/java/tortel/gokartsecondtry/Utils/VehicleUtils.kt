@@ -203,9 +203,9 @@ object VehicleUtils {
         }
         if (DriftingDir[plr] != "right" && DriftingDir[plr] != "left") return
 
-        Particle(PlayerHorses[plr]!!)
+        DriftParticle(PlayerHorses[plr]!!)
         val lastRot = PlayerRotations[plr]!!
-
+        //TODO: changing driftdir while drifting lags abit
         //originally right
         if (originalDriftingDir == "right"){
             if (right){
@@ -390,7 +390,7 @@ object VehicleUtils {
         MainItemDisplay.addPassenger(MetalsItemDisplay)
     }
 
-    //TODO: SMOKE PARTICLE WHEN DRIFTING
+
     fun Particle(Vehicle : Entity){
         val blockBelow = Vehicle.location.subtract(0.0, 1.0, 0.0).block
         val particleLoc = Vehicle.location.add(-Vehicle.location.direction.x,0.0,-Vehicle.location.direction.z)
@@ -400,6 +400,17 @@ object VehicleUtils {
 
         //plr.world.spawnParticle(org.bukkit.Particle.DUST_PLUME, Horse.location, 50, 0.0, 0.1 ,0.0)
 
+
+    }
+    //TODO: SMOKE PARTICLE WHEN DRIFTING
+    fun DriftParticle(Vehicle : Entity){
+        val blockBelow = Vehicle.location.subtract(0.0, 1.0, 0.0).block
+        val particleLoc = Vehicle.location.add(-Vehicle.location.direction.x,0.0,-Vehicle.location.direction.z)
+
+        val particleData = blockBelow.blockData
+        Vehicle.world.spawnParticle(org.bukkit.Particle.BLOCK, particleLoc, 25, 0.35, 0.1, 0.35, particleData)
+        Vehicle.world.spawnParticle(org.bukkit.Particle.DUST_PLUME, particleLoc, 1, 0.0, 0.0, 0.0)
+        //plr.world.spawnParticle(org.bukkit.Particle.DUST_PLUME, Horse.location, 50, 0.0, 0.1 ,0.0)
 
     }
 
@@ -502,7 +513,6 @@ object VehicleUtils {
                     if (PlayersDrifting.contains(plr)){
                         //TODO: ADD DRIFTING
                         drift(plr, playerKeyStates.get(plr)!!)
-
                     }
 
                     if (PlayersSteeringLeft.contains(plr)){
