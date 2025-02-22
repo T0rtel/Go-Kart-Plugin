@@ -1,4 +1,4 @@
-package tortel.gokartsecondtry.Utils
+package tortel.gokartsecondtry.Utils.Vehicle
 
 
 import io.papermc.paper.entity.TeleportFlag
@@ -9,8 +9,9 @@ import org.bukkit.entity.*
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.Vector
 import tortel.gokartsecondtry.Main
-import tortel.gokartsecondtry.Utils.RaceUtils.RaceStarted
-import tortel.gokartsecondtry.Utils.RaceUtils.PlayersInRace
+import tortel.gokartsecondtry.Utils.CONSTANTS
+import tortel.gokartsecondtry.Utils.Race.RaceUtils.RaceStarted
+import tortel.gokartsecondtry.Utils.Race.RaceUtils.PlayersInRace
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -58,69 +59,7 @@ object VehicleUtils {
     const val MinSpeedToStartDrifting = 0.03 // half the maxspeed
 
     //TODO: ADD NEW ROTATION VARIABLE, CHANGE FROM vehicle.velocity TO vehicle.setdeltaspeed or some shi
-    fun ToggleAccelerate(plr: Player, accelerate : Boolean){
-        if (accelerate){
-            if (!PlayersAccelerating.contains(plr)){
-                PlayersAccelerating.add(plr)
 
-            }
-        }else{
-            if (PlayersAccelerating.contains(plr)){
-                PlayersAccelerating.remove(plr)
-
-            }
-        }
-        /*
-        if (!PlayersAccelerating.contains(plr)){
-            PlayersAccelerating.add(plr)
-        }
-
-        //val Vehicle = getplrVehicle(plr)!! //TODO: IMPROVE
-
-        //val bounce = BounceBackIfWallAhead(plr)
-        IncreaseVel(plr)
-        //Vehicle.teleport(PlayerHorses[plr]!!)
-
-
-        //Vehicle.velocity =  Vector(Vehicle.location.direction.x,1.0,Vehicle.location.direction.z).multiply(Vector(PlayersVelocities[plr]!!,-5.0,PlayersVelocities[plr]!!))
-         */
-    }
-
-    fun toggleSteerLeft(plr : Player, steer : Boolean){
-        if (steer){
-            if (!PlayersSteeringLeft.contains(plr)){
-                PlayersSteeringLeft.add(plr)
-            }
-        }else{
-            if (PlayersSteeringLeft.contains(plr)){
-                PlayersSteeringLeft.remove(plr)
-            }
-        }
-    }
-
-    fun toggleSteerRight(plr : Player, steer : Boolean){
-        if (steer){
-            if (!PlayersSteeringRight.contains(plr)){
-                PlayersSteeringRight.add(plr)
-            }
-        }else{
-            if (PlayersSteeringRight.contains(plr)){
-                PlayersSteeringRight.remove(plr)
-            }
-        }
-    }
-
-    fun toggleBrakes(plr : Player, brake : Boolean){
-        if (brake){
-            if (!PlayersBraking.contains(plr)){
-                PlayersBraking.add(plr)
-            }
-        }else{
-            if (PlayersBraking.contains(plr)){
-                PlayersBraking.remove(plr)
-            }
-        }
-    }
     fun Brake(plr : Player){
         if (PlayersVelocities[plr]!! > 0.0 && !PlayersDrifting.contains(plr)){//PlayersAccelerating.contains(plr)
             println("${plr.name} is using brakes!!")
@@ -161,36 +100,7 @@ object VehicleUtils {
          */
 
     }
-//TODO: GOING ORIGINALLY RIGHT THEN CLICK ON LEFT STOPS DRIFTING
-    fun toggleDrifting(plr : Player, sides : Float, drift : Boolean){
-        val lastRot = PlayerRotations[plr]!!
 
-        if (drift && sides != 0.0f && PlayersVelocities[plr]!! > MinSpeedToStartDrifting){
-            if (!PlayersDrifting.contains(plr)){
-                PlayersDrifting.add(plr)
-                if (sides == -0.98f){
-                    DriftingDir[plr] = "right"
-
-                    PlayerRotations[plr] = lastRot + DriftingStartOffset
-
-                   // println("started originally right")
-                }
-                if (sides == 0.98f){
-                    DriftingDir[plr] = "left"
-
-                    PlayerRotations[plr] = lastRot - DriftingStartOffset
-
-                   // println("started originally left")
-                }
-            }
-        }else{
-            if (PlayersDrifting.contains(plr)){
-                PlayersDrifting.remove(plr)
-                DriftingDir.remove(plr)
-                //println("stop drifting")
-            }
-        }
-    }
     //TODO: FIX LETTING GO IF ANY OF DIRECTION KEYS(S/D) IT DOESNT STOP DRIFTINMG
     fun drift(plr : Player, KeyStates: KeyState){
         val originalDriftingDir = DriftingDir[plr]
@@ -266,7 +176,7 @@ object VehicleUtils {
             val z = vehicle.location.direction.y
             if (blockAboveBlockAhead.isCollidable && blockAboveBlockAhead.isSolid){
 
-                vehicle.velocity =  Vector(x,0.0,z).multiply(Vector(bouncePower,-0.5,bouncePower))
+                vehicle.velocity =  Vector(x,0.0,z).multiply(Vector(bouncePower,-0.5, bouncePower))
                 PlayersAccelerating.remove(plr)
                 return true
             }else{
@@ -461,7 +371,7 @@ object VehicleUtils {
         )
     }
     fun applyDriftingOffset(plr : Player, Velocity: Double, Horse: Entity, SpeedVector : Vector){
-        val keys = VehicleUtils.playerKeyStates.get(plr)
+        val keys = playerKeyStates.get(plr)
         if (!keys!!.dPressed && !keys.aPressed) {// player let go of both a and d key
             DecreaseVel(plr)
             applyAccVelocity(Velocity, Horse, SpeedVector)
@@ -491,7 +401,7 @@ object VehicleUtils {
         }
     }
     //TODO: FIX TURNING/DRIFTING DIFFER FROM PERSON TO PERSON (FASTER/SLOWER)
-    fun startRaceTicking(){
+    fun startVehicleTicking(){
         object : BukkitRunnable() {
             override fun run() {
                 if (!RaceStarted) return

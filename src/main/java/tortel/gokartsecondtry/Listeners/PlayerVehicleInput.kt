@@ -4,18 +4,14 @@ import com.comphenix.protocol.PacketType
 import com.comphenix.protocol.events.ListenerPriority
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
-import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
-import org.bukkit.util.Vector
 import tortel.gokartsecondtry.Main
-import tortel.gokartsecondtry.Utils.KeyListener.KeyPressEvent
-import tortel.gokartsecondtry.Utils.KeyListener.KeyReleaseEvent
-import tortel.gokartsecondtry.Utils.VehicleUtils
-import tortel.gokartsecondtry.Utils.VehicleUtils.ToggleAccelerate
-import tortel.gokartsecondtry.Utils.VehicleUtils.toggleBrakes
-import tortel.gokartsecondtry.Utils.VehicleUtils.toggleDrifting
-import tortel.gokartsecondtry.Utils.VehicleUtils.toggleSteerLeft
-import tortel.gokartsecondtry.Utils.VehicleUtils.toggleSteerRight
+import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils
+import tortel.gokartsecondtry.Utils.Vehicle.OnKeyToggle.ToggleAccelerate
+import tortel.gokartsecondtry.Utils.Vehicle.OnKeyToggle.toggleBrakes
+import tortel.gokartsecondtry.Utils.Vehicle.OnKeyToggle.toggleDrifting
+import tortel.gokartsecondtry.Utils.Vehicle.OnKeyToggle.toggleSteerLeft
+import tortel.gokartsecondtry.Utils.Vehicle.OnKeyToggle.toggleSteerRight
 
 /*
 class PlayerVehicleInput() : Listener{

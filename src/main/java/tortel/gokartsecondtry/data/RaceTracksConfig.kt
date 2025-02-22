@@ -1,10 +1,8 @@
 package tortel.gokartsecondtry.data
 
-import org.bukkit.OfflinePlayer
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import tortel.gokartsecondtry.Main
-import tortel.gokartsecondtry.Utils.RacingTracksConfigUtils
 import java.io.File
 
 object RaceTracksConfig {

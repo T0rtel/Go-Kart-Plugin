@@ -1,11 +1,8 @@
-package tortel.gokartsecondtry.Utils
+package tortel.gokartsecondtry.Utils.Race
 
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.scheduler.BukkitRunnable
-import tortel.gokartsecondtry.Main
 import tortel.gokartsecondtry.data.RaceTracksConfig
-import javax.sound.midi.Track
 
 object RacingTracksConfigUtils {
 

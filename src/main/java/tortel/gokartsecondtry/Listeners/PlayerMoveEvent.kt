@@ -3,8 +3,8 @@ package tortel.gokartsecondtry.Listeners
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerMoveEvent
-import tortel.gokartsecondtry.Utils.RaceUtils
-import tortel.gokartsecondtry.Utils.VehicleUtils
+import tortel.gokartsecondtry.Utils.Race.RaceUtils
+import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils
 
 class PlayerMoveEvent : Listener {
 

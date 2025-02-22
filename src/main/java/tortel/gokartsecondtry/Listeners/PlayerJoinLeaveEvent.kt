@@ -7,7 +7,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
 import tortel.gokartsecondtry.Utils.Garage.GarageVehicleUtils
-import tortel.gokartsecondtry.Utils.RaceUtils
+import tortel.gokartsecondtry.Utils.Race.RaceUtils
 
 
 class PlayerJoinLeaveEvent : Listener {

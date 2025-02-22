@@ -6,10 +6,8 @@ import org.bukkit.entity.Player
 import revxrsal.commands.annotation.Command
 import revxrsal.commands.annotation.Description
 import revxrsal.commands.annotation.Suggest
-import revxrsal.commands.bukkit.actor.BukkitCommandActor
 
-import tortel.gokartsecondtry.Utils.RaceUtils
-import javax.sound.midi.Track
+import tortel.gokartsecondtry.Utils.Race.RaceUtils
 
 
 class RaceCommand { //:CommandExecutor

@@ -1,6 +1,5 @@
 package tortel.gokartsecondtry.Utils.Garage
 
-import com.comphenix.protocol.PacketType.Play
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Entity
@@ -11,8 +10,6 @@ import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import tortel.gokartsecondtry.Main
 import tortel.gokartsecondtry.Utils.CONSTANTS
-import tortel.gokartsecondtry.Utils.RaceUtils
-import tortel.gokartsecondtry.Utils.VehicleUtils
 import kotlin.collections.HashMap
 
 object GarageVehicleUtils {

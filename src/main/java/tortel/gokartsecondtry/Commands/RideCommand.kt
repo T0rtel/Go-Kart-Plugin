@@ -7,11 +7,10 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 
 import org.bukkit.entity.*
-import revxrsal.commands.annotation.Command
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
-import tortel.gokartsecondtry.Utils.VehicleUtils.PlayerItemDisplays
-import tortel.gokartsecondtry.Utils.VehicleUtils.PlayerHorses
-import tortel.gokartsecondtry.Utils.VehicleUtils.getMobPlayerIsRiding
+import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.PlayerItemDisplays
+import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.PlayerHorses
+import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.getMobPlayerIsRiding
 
 
 class RideCommand  { // : CommandExecutor

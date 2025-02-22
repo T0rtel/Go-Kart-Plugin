@@ -15,10 +15,9 @@ import tortel.gokartsecondtry.Commands.GarageCommand
 import tortel.gokartsecondtry.Commands.RaceCommand
 import tortel.gokartsecondtry.Commands.TrackSetup.RacePosCommands
 import tortel.gokartsecondtry.Listeners.*
-import tortel.gokartsecondtry.Utils.RaceUtils
-import tortel.gokartsecondtry.Utils.VehicleUtils
+import tortel.gokartsecondtry.Utils.Race.RaceUtils
+import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils
 import tortel.gokartsecondtry.data.RaceTracksConfig
-import tortel.gokartsecondtry.data.database.MongoDb
 import java.io.File
 
 class Main : JavaPlugin() {
@@ -56,7 +55,7 @@ class Main : JavaPlugin() {
         setupConfigsOnEnable()
         registerEvents()
         registerCommands(this)
-        VehicleUtils.startRaceTicking()
+        VehicleUtils.startVehicleTicking()
         //setupConfigTickSystem()
         //setupTickSystem()
 
