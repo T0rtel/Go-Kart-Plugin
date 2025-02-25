@@ -12,6 +12,8 @@ import tortel.gokartsecondtry.Main
 import tortel.gokartsecondtry.Utils.CONSTANTS
 import tortel.gokartsecondtry.Utils.Race.RaceUtils.RaceStarted
 import tortel.gokartsecondtry.Utils.Race.RaceUtils.PlayersInRace
+import tortel.gokartsecondtry.Vehicle.Vehicle
+import tortel.gokartsecondtry.Vehicle.VehicleManager
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -24,19 +26,6 @@ object VehicleUtils {
         var sPressed: Boolean = false,
         var dPressed : Boolean = false
     )
-
-    val PlayersAccelerating = mutableListOf<Player>()
-    val PlayersBraking = mutableListOf<Player>()
-    val PlayersSteeringLeft = mutableListOf<Player>()
-    val PlayersSteeringRight = mutableListOf<Player>()
-
-    val PlayersVelocities = mutableMapOf<Player, Double>()
-    val PlayerRotations = mutableMapOf<Player, Float>() // Player, Float
-    val PlayerHorses = mutableMapOf<Player, Entity>()
-    val PlayerItemDisplays = mutableMapOf<Player, List<Entity>>()
-    val PlayersDrifting = mutableListOf<Player>()
-    val DriftingDir = mutableMapOf<Player, String>()
-
     val playerKeyStates = mutableMapOf<Player, KeyState>()
 
     //driving
@@ -60,21 +49,46 @@ object VehicleUtils {
 
     //TODO: ADD NEW ROTATION VARIABLE, CHANGE FROM vehicle.velocity TO vehicle.setdeltaspeed or some shi
 
+    fun getVehicleManager(): VehicleManager {
+        return Main.vehicleManager
+    }
+
     fun Brake(plr : Player){
-        if (PlayersVelocities[plr]!! > 0.0 && !PlayersDrifting.contains(plr)){//PlayersAccelerating.contains(plr)
+        val VehicleManager = getVehicleManager()
+        val Vehicle = VehicleManager.getVehicle(plr)
+
+        if (Vehicle.velocity > 0.0 && !Vehicle.isDrifting){//Vehicle.isAccelerating
+            println("${plr.name} is using brakes!!")
+            Vehicle.velocity -= braking
+        }
+        /*
+
+        if (PlayersVelocities[plr]!! > 0.0 && !PlayersDrifting.contains(plr)){//Vehicle.isAccelerating
             println("${plr.name} is using brakes!!")
             PlayersVelocities[plr]= PlayersVelocities[plr]!! - braking
         }
+         */
+
     }
 
     fun SteerRight(plr : Player){
+        val VehicleManager = getVehicleManager()
+        val Vehicle = VehicleManager.getVehicle(plr)
+        Vehicle.rotation.let { plrYawRotation ->
+            if (Vehicle.isDrifting || Vehicle.velocity <= 0.0) return
+
+            Vehicle.rotation =  plrYawRotation + MaxRotationSpeed
+        }
+        /*
         PlayerRotations[plr]?.let { plrYawRotation ->
             if (PlayersDrifting.contains(plr) || PlayersVelocities[plr]!! <= 0.0) return
 
             PlayerRotations[plr] =  plrYawRotation + MaxRotationSpeed
         }
+         */
+
         /*
-        if (PlayersVelocities[plr]!! > 0.0 && !PlayersDrifting.contains(plr)){//PlayersAccelerating.contains(plr)
+        if (PlayersVelocities[plr]!! > 0.0 && !PlayersDrifting.contains(plr)){//Vehicle.isAccelerating
             val lastRot = PlayerRotations[plr]!!
             PlayerRotations[plr] =  lastRot + MaxRotationSpeed
             println("Delta angle : ${PlayerRotations[plr]!! - lastRot}")
@@ -85,14 +99,25 @@ object VehicleUtils {
     }
 
     fun SteerLeft(plr : Player){
+        val VehicleManager = getVehicleManager()
+        val Vehicle = VehicleManager.getVehicle(plr)
+
+        Vehicle.rotation.let { plrYawRotation ->
+            if (Vehicle.isDrifting || Vehicle.velocity <= 0.0) return
+
+            Vehicle.rotation =  plrYawRotation - MaxRotationSpeed
+        }
+        /*
         PlayerRotations[plr]?.let { plrYawRotation ->
             if (PlayersDrifting.contains(plr) || PlayersVelocities[plr]!! <= 0.0) return
 
             PlayerRotations[plr] =  plrYawRotation - MaxRotationSpeed
         }
+         */
+
         /*
 
-        if (PlayersVelocities[plr]!! > 0.0 && !PlayersDrifting.contains(plr)){//PlayersAccelerating.contains(plr)
+        if (PlayersVelocities[plr]!! > 0.0 && !PlayersDrifting.contains(plr)){//Vehicle.isAccelerating
             val lastRot = PlayerRotations[plr]!!
 
             PlayerRotations[plr] = lastRot - MaxRotationSpeed
@@ -103,7 +128,10 @@ object VehicleUtils {
 
     //TODO: FIX LETTING GO IF ANY OF DIRECTION KEYS(S/D) IT DOESNT STOP DRIFTINMG
     fun drift(plr : Player, KeyStates: KeyState){
-        val originalDriftingDir = DriftingDir[plr]
+        val VehicleManager = getVehicleManager()
+        val Vehicle = VehicleManager.getVehicle(plr)
+
+        val originalDriftingDir = Vehicle.DriftingDir
         val right = KeyStates.dPressed
         val left = KeyStates.aPressed
         if (!right && !left) {
@@ -111,115 +139,68 @@ object VehicleUtils {
             //DriftingDir.remove(plr)
             return
         }
-        if (DriftingDir[plr] != "right" && DriftingDir[plr] != "left") return
+        if (Vehicle.DriftingDir != "right" && Vehicle.DriftingDir != "left") return
 
-        DriftParticle(PlayerHorses[plr]!!)
-        val lastRot = PlayerRotations[plr]!!
+        DriftParticle(Vehicle.VehicleHorse)
         //TODO: changing driftdir while drifting lags abit
-        //originally right
-        if (originalDriftingDir == "right"){
-            if (right){
+        Vehicle.rotation.let { lastRot ->
+            //originally right
+            if (originalDriftingDir == "right"){
+                if (right){
 
-               // Bukkit.broadcastMessage("not Wide angle drift")
-                PlayerRotations[plr] = lastRot + MaxDriftingRotationSpeed
-            }
-            if (left){
+                    // Bukkit.broadcastMessage("not Wide angle drift")
+                    Vehicle.rotation = lastRot + MaxDriftingRotationSpeed
+                }
+                if (left){
 
-               // Bukkit.broadcastMessage("Wide angle drift")
-                PlayerRotations[plr] = lastRot + MinDriftingRotationSpeed
+                    // Bukkit.broadcastMessage("Wide angle drift")
+                    Vehicle.rotation = lastRot + MinDriftingRotationSpeed
+                }
             }
-        }
-        //originally left
-        if (originalDriftingDir == "left"){
-            if (left){
+            //originally left
+            if (originalDriftingDir == "left"){
+                if (left){
 
-              //  Bukkit.broadcastMessage("not Wide angle drift")
-                PlayerRotations[plr] = lastRot - MaxDriftingRotationSpeed
-            }
-            if (right){
+                    //  Bukkit.broadcastMessage("not Wide angle drift")
+                    Vehicle.rotation = lastRot - MaxDriftingRotationSpeed
+                }
+                if (right){
 
-               // Bukkit.broadcastMessage("Wide angle drift")
-                PlayerRotations[plr] = lastRot - MinDriftingRotationSpeed
+                    // Bukkit.broadcastMessage("Wide angle drift")
+                    Vehicle.rotation = lastRot - MinDriftingRotationSpeed
+                }
             }
+
         }
 
     }
 
     fun IncreaseVel(plr : Player){
-        PlayersVelocities[plr]?.let { plrvelocity ->
+        val VehicleManager = getVehicleManager()
+        val Vehicle = VehicleManager.getVehicle(plr)
+
+        Vehicle.velocity.let { plrvelocity ->
             if (plrvelocity < MaxSpeed) {
-                PlayersVelocities[plr] = (plrvelocity + Acceleration).coerceAtMost(MaxSpeed)
+                Vehicle.velocity = (plrvelocity + Acceleration).coerceAtMost(MaxSpeed)
             }
         }
 
     }
 
     fun DecreaseVel(plr: Player) {
-        PlayersVelocities[plr]?.let { velocity ->
+        val VehicleManager = getVehicleManager()
+        val Vehicle = VehicleManager.getVehicle(plr)
+
+        Vehicle.velocity.let { velocity ->
             if (velocity > 0) {
-                PlayersVelocities[plr] = (velocity - deceleration).coerceAtLeast(0.0)
-                //getplrVehicle(plr)!!.velocity =  Vector(getplrVehicle(plr)!!.location.direction.x,0.0,getplrVehicle(plr)!!.location.direction.z).multiply(Vector(PlayersVelocities[plr]!!,-0.5,PlayersVelocities[plr]!!))
+                Vehicle.velocity = (velocity - deceleration).coerceAtLeast(0.0)
             }
         }
     }
 
-    fun BounceBackIfWallAhead(plr : Player) : Boolean{
-        val vehicle = getplrVehicle(plr) ?: return false
-        if (vehicle.world.rayTraceBlocks(vehicle.location, vehicle.location.direction, 1.0) == null) return false
-        val blockAhead = vehicle.world.rayTraceBlocks(vehicle.location, vehicle.location.direction, 1.0)!!.hitBlock ?: return false//.add(0.0,0.0,1.0).block.type
-        val blockAboveBlockAhead = blockAhead.location.add(0.0,1.0,0.0).block.type
-
-        //println("${blockAhead.type}, $blockAboveBlockAhead")
-
-        if (blockAhead.isCollidable && blockAhead.isSolid){
-            val x = vehicle.location.direction.x
-            val z = vehicle.location.direction.y
-            if (blockAboveBlockAhead.isCollidable && blockAboveBlockAhead.isSolid){
-
-                vehicle.velocity =  Vector(x,0.0,z).multiply(Vector(bouncePower,-0.5, bouncePower))
-                PlayersAccelerating.remove(plr)
-                return true
-            }else{
-               // println("STAIRS(MAYBE)")
-
-                return false
-            }
-
-        }
-
-        return false
-    }
-    fun getplrVehicle(plr : Player): Entity? {
-        return if (plr.isInsideVehicle){
-            plr.vehicle
-        }else{
-            null
-        }
-
-    }
-
-    fun getMobPlayerIsRiding(plr: Player): Mob? {
-        // Get the player's vehicle (the entity they are riding)
-       // val nmsPlayer = (plr as CraftPlayer).handle
-        val vehicle = plr.vehicle
-
-        for (entity in plr.world.entities) {
-            if (entity is Mob && entity.name == plr.name){
-                //Bukkit.broadcastMessage("$entity")
-                return entity
-            }
-        }
-
-        return if (vehicle != null){
-            vehicle as Mob
-        }else{
-            null
-        }
-
-    }
     //TODO: FIX SHIFTING BEFORE GAME START LETS YOU OFF IT
     //TODO: FIX SHIFT + LEFT/RIGHT CLICK THE KART LETS YOU OFF IT
-    fun spawnHorse(worldname : String, plr : Player){
+    fun spawnHorse(worldname : String, plr : Player): Horse {
         val Horse = Bukkit.getWorld(worldname)!!
             .spawnEntity(
                 Location(plr.world,plr.location.x, plr.location.y, plr.location.z, plr.location.yaw, plr.location.pitch),
@@ -239,13 +220,11 @@ object VehicleUtils {
         Horse.owner = plr
         Horse.isSilent = true
 
-
         Horse.customName(Component.text(plr.name))
-        //Horse.let { horse -> Bukkit.getMobGoals().removeAllGoals(horse)}
+
         Bukkit.getMobGoals().removeAllGoals(Horse)
-        //Horse.setRotation(0f,0.0f)
-        //Horse.addPassenger(plr)
-        PlayerHorses[plr] = Horse
+
+        return Horse
     }
 
     //TODO: KART COLORS
@@ -253,7 +232,10 @@ object VehicleUtils {
 
     }
 
-    fun spawnItemDisplay(worldname: String, plr : Player){
+    fun spawnItemDisplay(worldname: String, plr : Player): List<ItemDisplay> {
+        val VehicleManager = getVehicleManager()
+        val Vehicle = VehicleManager.getVehicle(plr)
+
         //10051 metal stuff
         //10052 wheel
         //10055 main body
@@ -263,7 +245,7 @@ object VehicleUtils {
         MainItemDisplay.setNoPhysics(true)
         MainItemDisplay.setGravity(false)
         MainItemDisplay.teleportDuration = 1
-        MainItemDisplay.customName(Component.text(PlayerHorses[plr]!!.uniqueId.toString()))
+        MainItemDisplay.customName(Component.text(Vehicle.owner.uniqueId.toString()))
         MainItemDisplay.addScoreboardTag("needstotp")
         MainItemDisplay.addPassenger(plr)
 
@@ -275,7 +257,7 @@ object VehicleUtils {
         WheelItemDisplay.setNoPhysics(true)
         WheelItemDisplay.setGravity(false)
         WheelItemDisplay.teleportDuration = 1
-        WheelItemDisplay.customName(Component.text(PlayerHorses[plr]!!.uniqueId.toString()))
+        WheelItemDisplay.customName(Component.text(Vehicle.owner.uniqueId.toString()))
         WheelItemDisplay.addScoreboardTag("needstotp")
         WheelItemDisplay.addPassenger(plr)
 
@@ -287,17 +269,18 @@ object VehicleUtils {
         MetalsItemDisplay.setNoPhysics(true)
         MetalsItemDisplay.setGravity(false)
         MetalsItemDisplay.teleportDuration = 1
-        MetalsItemDisplay.customName(Component.text(PlayerHorses[plr]!!.uniqueId.toString()))
+        MetalsItemDisplay.customName(Component.text(Vehicle.owner.uniqueId.toString()))
         MetalsItemDisplay.addScoreboardTag("needstotp")
         MetalsItemDisplay.addPassenger(plr)
 
         MetalsItemDisplay.setItemStack(CONSTANTS.getKartMetal())
 
         val displays = mutableListOf<Entity>(MainItemDisplay,WheelItemDisplay,MetalsItemDisplay)
-        PlayerItemDisplays[plr] = displays
 
         MainItemDisplay.addPassenger(WheelItemDisplay)
         MainItemDisplay.addPassenger(MetalsItemDisplay)
+
+        return listOf(MainItemDisplay, WheelItemDisplay, MetalsItemDisplay)
     }
 
 
@@ -324,45 +307,6 @@ object VehicleUtils {
 
     }
 
-    fun despawnHorse(plr : Player){
-        if (PlayerHorses.contains(plr)){
-            PlayerHorses[plr]!!.remove()
-
-            PlayerHorses.remove(plr)
-        }
-    }
-
-    fun despawnItemDisplay(plr : Player){
-        if (PlayerItemDisplays.contains(plr)){
-            PlayerItemDisplays[plr]!!.forEach {
-                it.remove()
-            }
-
-            PlayerItemDisplays.remove(plr)
-        }
-    }
-
-    fun resetAllValues(){
-       // println("BEFORE: $PlayersVelocities $PlayerRotations $PlayersSteeringLeft $PlayersSteeringRight $PlayersDrifting $PlayerHorses $PlayersBraking $PlayersAccelerating $PlayersInRace end of before")
-        if (PlayersInRace.size == 0) return
-        for (plr in PlayersInRace.toList()){
-            println("removing values for ${plr.name} who is in PlayersInRace")
-            PlayersVelocities[plr] = 0.0
-            PlayerRotations[plr] = 0.0f
-            //PlayersInRace.remove(plr)
-        }
-        PlayersInRace.clear()
-       // println(" AFTER: $PlayersVelocities $PlayerRotations $PlayersSteeringLeft $PlayersSteeringRight $PlayersDrifting $PlayerHorses $PlayersBraking $PlayersAccelerating $PlayersInRace end of after")
-    }
-
-    fun resetValues(plr : Player){
-       // println("BEFORE: $PlayersVelocities $PlayerRotations $PlayersSteeringLeft $PlayersDrifting $PlayerHorses $PlayersBraking $PlayersAccelerating $PlayersInRace \n\n")
-        PlayersVelocities[plr] = 0.0
-        PlayerRotations[plr] = 0.0f
-        PlayersInRace.remove(plr)
-       // println(" AFTER: $PlayersVelocities $PlayerRotations $PlayersSteeringLeft $PlayersDrifting $PlayerHorses $PlayersBraking $PlayersAccelerating $PlayersInRace")
-    }
-
     fun applyAccVelocity(Velocity : Double , Horse : Entity, SpeedVector : Vector){
 
         Horse.velocity = Vector(Horse.location.direction.x, 0.5, Horse.location.direction.z).multiply(
@@ -371,6 +315,10 @@ object VehicleUtils {
         )
     }
     fun applyDriftingOffset(plr : Player, Velocity: Double, Horse: Entity, SpeedVector : Vector){
+        val VehicleManager = getVehicleManager()
+        val Vehicle = VehicleManager.getVehicle(plr)
+
+
         val keys = playerKeyStates.get(plr)
         if (!keys!!.dPressed && !keys.aPressed) {// player let go of both a and d key
             DecreaseVel(plr)
@@ -385,14 +333,14 @@ object VehicleUtils {
         val rightdriftingx = -sin(radians) * driftingforwardSpeed  - cos(radians)* driftingdiagonalOffset
         val rightdriftingz = cos(radians) * driftingforwardSpeed - sin(radians)* driftingdiagonalOffset
 
-        if (DriftingDir[plr] == "left") {
+        if (Vehicle.DriftingDir == "left") {
 
             Horse.velocity = Vector(rightdriftingx, 0.5, rightdriftingz).multiply(
                 SpeedVector
             )
 
 
-        }else if (DriftingDir[plr] == "right") {
+        }else if (Vehicle.DriftingDir == "right") {
 
             Horse.velocity = Vector(leftdriftingx, 0.5, leftdriftingz).multiply(
                 SpeedVector
@@ -402,84 +350,71 @@ object VehicleUtils {
     }
     //TODO: FIX TURNING/DRIFTING DIFFER FROM PERSON TO PERSON (FASTER/SLOWER)
     fun startVehicleTicking(){
+        val VehicleManager = getVehicleManager()
+
         object : BukkitRunnable() {
             override fun run() {
                 if (!RaceStarted) return
                 for (plr in PlayersInRace) {
-                    val Horse = PlayerHorses[plr] ?: continue
-
-                    val ItemDisplays = PlayerItemDisplays[plr] ?: continue
-
-                    val plryawRotation = PlayerRotations[plr] ?: continue
+                    val Vehicle = VehicleManager.getVehicle(plr)
 
                     // VELOCITY
-                    if (PlayersAccelerating.contains(plr)){
+                    if (Vehicle.isAccelerating){
                         IncreaseVel(plr)
-                        Particle(Horse)
+                        Particle(Vehicle.VehicleHorse)
                     }
-                    if (PlayersBraking.contains(plr)){
+                    if (Vehicle.isBraking){
                         Brake(plr)
                     }
-                    if (PlayersDrifting.contains(plr)){
+                    if (Vehicle.isDrifting){
                         //TODO: ADD DRIFTING
                         drift(plr, playerKeyStates.get(plr)!!)
                     }
 
-                    if (PlayersSteeringLeft.contains(plr)){
+                    if (Vehicle.steering == -1.0){
                         SteerLeft(plr)
                     }
-                    if (PlayersSteeringRight.contains(plr)){
+                    if (Vehicle.steering == 1.0){
                         SteerRight(plr)
                     }
 
 
 
-                    val Velocity = PlayersVelocities[plr] ?: continue
+                    val Velocity = Vehicle.velocity ?: continue
 
-                    if (Velocity < 0.0) { PlayersVelocities[plr] = 0.0 }
+                    if (Velocity < 0.0) { Vehicle.velocity = 0.0 }
 
 
                     val SpeedVector = Vector(Velocity, GravityValue, Velocity)
 
                     // ROTATION
 
-                    Horse.setRotation(plryawRotation, 0.0f)
-                    ItemDisplays[1].setRotation(plryawRotation, 0.0f)
-                    ItemDisplays[2].setRotation(plryawRotation, 0.0f)
+                    Vehicle.VehicleHorse.setRotation(Vehicle.rotation, 0.0f)
+                    Vehicle.VehicleItemDisplays[1].setRotation(Vehicle.rotation, 0.0f)
+                    Vehicle.VehicleItemDisplays[2].setRotation(Vehicle.rotation, 0.0f)
 
-                    ItemDisplays[0].teleport(Horse.location.add(CONSTANTS.KartOffset), TeleportFlag.EntityState.RETAIN_PASSENGERS)
+                    Vehicle.VehicleItemDisplays[0].teleport(Vehicle.VehicleHorse.location.add(CONSTANTS.KartOffset), TeleportFlag.EntityState.RETAIN_PASSENGERS)
 
 
 
                     //FORCES
-                    if (PlayersDrifting.contains(plr) ){ // && Velocity > (Velocity * 20/100)
-                        applyDriftingOffset(plr, Velocity, Horse, SpeedVector)
+                    if (Vehicle.isDrifting){ // && Velocity > (Velocity * 20/100)
+                        applyDriftingOffset(plr, Velocity, Vehicle.VehicleHorse, SpeedVector)
                     }
-                    if (!PlayersDrifting.contains(plr)){ // PlayersAccelerating.contains(plr) &&
-                        applyAccVelocity(Velocity, Horse, SpeedVector)
+                    if (!Vehicle.isDrifting){ // Vehicle.isAccelerating &&
+                        applyAccVelocity(Velocity, Vehicle.VehicleHorse, SpeedVector)
                     }//w
 
                     // DECELERATION
-                    if (!PlayersAccelerating.contains(plr) && PlayersVelocities[plr]!! > 0.0 && !PlayersDrifting.contains(plr)) {
+                    if (!Vehicle.isAccelerating && Vehicle.velocity > 0.0 && !Vehicle.isDrifting) {
                         //println("Decelerate plr")
                         DecreaseVel(plr)
 
                     }
 
-
-                    //PlayersAccelerating.remove(plr)
-                    //PlayersDrifting.remove(plr)
-
-                    /*
-                    if (!RaceStarted) {
-                        this.cancel()
-                        return
-                    }
-
-                     */
                 }
 
             }
-        }.runTaskTimer(Main.instance!!, 1, 1)
+        }.runTaskTimer(Main.instance, 1, 1)
     }
 }

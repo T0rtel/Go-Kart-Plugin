@@ -6,13 +6,7 @@ import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import tortel.gokartsecondtry.Main
 import tortel.gokartsecondtry.Utils.Race.RacingTracksConfigUtils.getTrackCoords
-import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils
-import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.despawnItemDisplay
-import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.despawnHorse
-import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.resetAllValues
-import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.resetValues
-import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.spawnItemDisplay
-import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.spawnHorse
+import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.getVehicleManager
 
 
 object RaceUtils {
@@ -37,7 +31,7 @@ object RaceUtils {
             override fun run() {
                 spawnVehicles(TrackName)
             }
-        }.runTaskLater(Main.instance!!, 5)
+        }.runTaskLater(Main.instance, 10)
 
         //VehicleUtils.startRaceTicking()
 
@@ -78,92 +72,47 @@ object RaceUtils {
 
             val selectedplr: Player = players.random()
 
-            //chosenPlayers.plus(selectedplr.name)
-            //chosenPlayers += selectedplr.name
+
             chosenPlayers.add(selectedplr.name)
 
-
-
-            //println("want to tp ${selectedplr.name} to ${loc.x} ${loc.y} ${loc.z} ${loc.pitch} in which his number is $i  player")
-            //println(chosenPlayers)
             selectedplr.teleport(loc)
 
             i++
         }
 
         chosenPlayers.clear()
-        /*
-
-        val coords = RaceCoords[raceName]!!
-        for ((index, onlineplayer) in Bukkit.getOnlinePlayers().withIndex()) {
-            if (index < 5 ){
-                println(index)
-                onlineplayer.teleport(Location(Bukkit.getWorld("kartmap"),
-                    (coords.x + (index) * 2.0),
-                    coords.y,
-                    coords.z - ((index) * 2.0),coords.yaw, coords.pitch)) //((index - 1) * 2.0),0.0,((index - 1) * 2.0))
-            }else if(index in 5..8){
-                //onlineplayer.teleport(RaceCoords[RaceName]!!.add(Vector((index - 1) * 2.0,0.0, 5 + (index - 1) * 2.0)))
-                onlineplayer.teleport(Location(Bukkit.getWorld("kartmap"),
-                    (coords.x + (5 + (index - 5) * 2.0)),
-                    coords.y,
-                    coords.z - ((index - 5) * 2.0),coords.yaw, coords.pitch)) //((index - 1) * 2.0),0.0,((index - 1) * 2.0))
-            }
-        }
-         */
-
     }
 
     fun spawnVehicles(TrackName: String){
         for (onlineplayer in Bukkit.getOnlinePlayers()) {
             //TODO: IF PLAYER IS READY FOR A RACE
-            spawnHorse(TrackName, onlineplayer)
-            spawnItemDisplay(TrackName, onlineplayer)
 
-            PlayersInRace.add(onlineplayer)
+            Main.vehicleManager.getVehicle(onlineplayer).spawn(TrackName)
         }
         println("finished spawning everything , players in race : $PlayersInRace")
     }
     fun despawnVehicles(){
-        println("despawning ALL vehicles")
-        for (onlineplayer in PlayersInRace) {
-            despawnHorse(onlineplayer)
-            despawnItemDisplay(onlineplayer)
+        val VehicleManager = getVehicleManager()
 
-        }
-        resetAllValues()
+        println("despawning ALL vehicles")
+        VehicleManager.removeAllVehicles()
+
         println("finished despawning all karts")
     }
-    fun despawnVehiclesForPlayer(plr : Player){
-        despawnHorse(plr)
-        despawnItemDisplay(plr)
 
-
-        resetValues(plr)
-
-        //PlayersInRace.minus(plr)
-
-        println("finished despawning vehicle for ${plr.name}")
-    }
     fun canSetup(raceName : String) : Boolean{
         if (Bukkit.getWorld(raceName) == null) return false
         if (RaceStarted) return false // race already going on
-        //if (!PlayerHorses.isEmpty()) return false
-        //if (!PlayersInRace.isEmpty()) return false
+
         return true
     }
 
-    fun onPlayerEnterGame(plr : Player){ // when player connects
-        VehicleUtils.PlayersVelocities.put(plr, 0.0)
-        VehicleUtils.PlayerRotations.put(plr, 0.0f)
-    }
     fun onPlayerLeaveGame(plr : Player){ // when player Disconnects
+        val VehicleManager = getVehicleManager()
+
         if (RaceStarted == true && PlayersInRace.contains(plr)){
             //TODO: REJOIN GAME
-            despawnVehiclesForPlayer(plr)
-
-            VehicleUtils.PlayersVelocities.remove(plr)
-            VehicleUtils.PlayerRotations.remove(plr)
+            VehicleManager.removeVehicle(plr)
 
             stopRaceIfEmpty()
         }

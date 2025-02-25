@@ -12,6 +12,7 @@ import tortel.gokartsecondtry.Utils.Vehicle.OnKeyToggle.toggleBrakes
 import tortel.gokartsecondtry.Utils.Vehicle.OnKeyToggle.toggleDrifting
 import tortel.gokartsecondtry.Utils.Vehicle.OnKeyToggle.toggleSteerLeft
 import tortel.gokartsecondtry.Utils.Vehicle.OnKeyToggle.toggleSteerRight
+import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.getVehicleManager
 
 /*
 class PlayerVehicleInput() : Listener{
@@ -25,7 +26,7 @@ class PlayerVehicleInput() : Listener{
 
 
 class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(
-    Main.instance!!,
+    Main.instance,
     ListenerPriority.NORMAL,  // Synchronous priority
     PacketType.Play.Client.STEER_VEHICLE) {
 
@@ -34,13 +35,8 @@ class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(
         //detect if player moves //STEER_VEHICLE
         if (event.packetType == PacketType.Play.Client.STEER_VEHICLE){
             val plr = event.player
-
-            if (!VehicleUtils.PlayersVelocities.contains(plr)){
-                VehicleUtils.PlayersVelocities.put(plr, 0.0)
-            }
-            if (!VehicleUtils.PlayerRotations.contains(plr)){
-                VehicleUtils.PlayerRotations.put(plr, 0.0f)
-            }
+            val VehicleManager = getVehicleManager()
+            val Vehicle = VehicleManager.getVehicle(plr)
 
             val forwardMovement = event.packet.float.read(1) // W/S
             val sidewardMovement = event.packet.float.read(0) // A/D

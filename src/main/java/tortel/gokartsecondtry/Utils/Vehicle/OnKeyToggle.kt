@@ -1,111 +1,86 @@
 package tortel.gokartsecondtry.Utils.Vehicle
 
 import org.bukkit.entity.Player
-import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.DriftingDir
 import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.DriftingStartOffset
 import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.MinSpeedToStartDrifting
-import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.PlayerRotations
-import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.PlayersAccelerating
-import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.PlayersBraking
-import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.PlayersDrifting
-import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.PlayersSteeringLeft
-import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.PlayersSteeringRight
-import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.PlayersVelocities
+import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.getVehicleManager
 
 object OnKeyToggle {
 
     fun ToggleAccelerate(plr: Player, accelerate : Boolean){
-        if (accelerate){
-            if (!PlayersAccelerating.contains(plr)){
-                PlayersAccelerating.add(plr)
-
-            }
-        }else{
-            if (PlayersAccelerating.contains(plr)){
-                PlayersAccelerating.remove(plr)
-
-            }
-        }
-        /*
-        if (!PlayersAccelerating.contains(plr)){
-            PlayersAccelerating.add(plr)
-        }
-
-        //val Vehicle = getplrVehicle(plr)!! //TODO: IMPROVE
-
-        //val bounce = BounceBackIfWallAhead(plr)
-        IncreaseVel(plr)
-        //Vehicle.teleport(PlayerHorses[plr]!!)
+        val VehicleManager = getVehicleManager()
+        val Vehicle = VehicleManager.getVehicle(plr)
 
 
-        //Vehicle.velocity =  Vector(Vehicle.location.direction.x,1.0,Vehicle.location.direction.z).multiply(Vector(PlayersVelocities[plr]!!,-5.0,PlayersVelocities[plr]!!))
-         */
+        Vehicle.isAccelerating = accelerate
     }
 
     fun toggleSteerLeft(plr : Player, steer : Boolean){
+        val VehicleManager = getVehicleManager()
+        val Vehicle = VehicleManager.getVehicle(plr)
+
         if (steer){
-            if (!PlayersSteeringLeft.contains(plr)){
-                PlayersSteeringLeft.add(plr)
-            }
+            Vehicle.steering = -1.0
         }else{
-            if (PlayersSteeringLeft.contains(plr)){
-                PlayersSteeringLeft.remove(plr)
-            }
+            Vehicle.steering = 0.0
         }
     }
 
     fun toggleSteerRight(plr : Player, steer : Boolean){
+        val VehicleManager = getVehicleManager()
+        val Vehicle = VehicleManager.getVehicle(plr)
+
+
         if (steer){
-            if (!PlayersSteeringRight.contains(plr)){
-                PlayersSteeringRight.add(plr)
-            }
+            Vehicle.steering = 1.0
         }else{
-            if (PlayersSteeringRight.contains(plr)){
-                PlayersSteeringRight.remove(plr)
-            }
+            Vehicle.steering = 0.0
         }
     }
 
     fun toggleBrakes(plr : Player, brake : Boolean){
-        if (brake){
-            if (!PlayersBraking.contains(plr)){
-                PlayersBraking.add(plr)
-            }
-        }else{
-            if (PlayersBraking.contains(plr)){
-                PlayersBraking.remove(plr)
-            }
-        }
+        val VehicleManager = getVehicleManager()
+        val Vehicle = VehicleManager.getVehicle(plr)
+
+
+        Vehicle.isBraking = brake
     }
 
     //TODO: GOING ORIGINALLY RIGHT THEN CLICK ON LEFT STOPS DRIFTING
     fun toggleDrifting(plr : Player, sides : Float, drift : Boolean){
-        val lastRot = PlayerRotations[plr]!!
+        val VehicleManager = getVehicleManager()
+        val Vehicle = VehicleManager.getVehicle(plr)
 
-        if (drift && sides != 0.0f && PlayersVelocities[plr]!! > MinSpeedToStartDrifting){
-            if (!PlayersDrifting.contains(plr)){
-                PlayersDrifting.add(plr)
-                if (sides == -0.98f){
-                    DriftingDir[plr] = "right"
 
-                    PlayerRotations[plr] = lastRot + DriftingStartOffset
 
-                    // println("started originally right")
+        Vehicle.rotation.let { lastRot ->
+            if (drift && sides != 0.0f && Vehicle.velocity > MinSpeedToStartDrifting){
+                if (!Vehicle.isDrifting){
+                    Vehicle.isDrifting = true
+                    if (sides == -0.98f){
+                        Vehicle.DriftingDir = "right"
+
+                        Vehicle.rotation = lastRot + DriftingStartOffset
+
+                        // println("started originally right")
+                    }
+                    if (sides == 0.98f){
+                        Vehicle.DriftingDir = "left"
+
+                        Vehicle.rotation = lastRot - DriftingStartOffset
+
+                        // println("started originally left")
+                    }
                 }
-                if (sides == 0.98f){
-                    DriftingDir[plr] = "left"
-
-                    PlayerRotations[plr] = lastRot - DriftingStartOffset
-
-                    // println("started originally left")
+            }else{
+                if (Vehicle.isDrifting){
+                    Vehicle.isDrifting = false
+                    Vehicle.DriftingDir = ""
+                    //println("stop drifting")
                 }
-            }
-        }else{
-            if (PlayersDrifting.contains(plr)){
-                PlayersDrifting.remove(plr)
-                DriftingDir.remove(plr)
-                //println("stop drifting")
             }
         }
+
+
     }
 }
