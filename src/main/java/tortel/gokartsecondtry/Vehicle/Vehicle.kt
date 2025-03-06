@@ -30,19 +30,13 @@ class Vehicle(private val player: Player) {
         // Logic to spawn the vehicle for the player
         player.sendMessage("Kart spawned!")
 
-        val Horse = spawnHorse(TrackName, player)
-        val ItemDisplays = spawnItemDisplay(TrackName, player)
+        VehicleHorse = spawnHorse(TrackName, player)
+        VehicleItemDisplays = spawnItemDisplay(TrackName, player)
 
-        VehicleHorse = Horse
-        VehicleItemDisplays = ItemDisplays
+        //VehicleHorse = Horse
+        //VehicleItemDisplays = ItemDisplays
 
         PlayersInRace.add(player)
-    }
-
-    // Example: Move the vehicle
-    fun move(direction: String) {
-        // Logic to move the vehicle
-        player.sendMessage("Vehicle moved $direction!")
     }
 
     // Example: Despawn the vehicle

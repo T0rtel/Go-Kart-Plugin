@@ -29,11 +29,11 @@ class Main : JavaPlugin() {
     companion object {
         var dataFolderDir: File = File("")
             private set
-        var instance: JavaPlugin = getPlugin(Main::class.java)
+        var instance: JavaPlugin? = null
             private set
         var mongoDb: MongoDatabase? = null
             private set
-        var vehicleManager = VehicleManager()
+        var vehicleManager: VehicleManager? = null
             private set
     }//test
 

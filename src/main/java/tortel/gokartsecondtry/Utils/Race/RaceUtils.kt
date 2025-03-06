@@ -31,7 +31,7 @@ object RaceUtils {
             override fun run() {
                 spawnVehicles(TrackName)
             }
-        }.runTaskLater(Main.instance, 10)
+        }.runTaskLater(Main.instance!!, 10)
 
         //VehicleUtils.startRaceTicking()
 
@@ -87,12 +87,13 @@ object RaceUtils {
         for (onlineplayer in Bukkit.getOnlinePlayers()) {
             //TODO: IF PLAYER IS READY FOR A RACE
 
-            Main.vehicleManager.getVehicle(onlineplayer).spawn(TrackName)
+            Main.vehicleManager?.getVehicle(onlineplayer)?.spawn(TrackName)
+
         }
         println("finished spawning everything , players in race : $PlayersInRace")
     }
     fun despawnVehicles(){
-        val VehicleManager = getVehicleManager()
+        val VehicleManager = getVehicleManager()!!
 
         println("despawning ALL vehicles")
         VehicleManager.removeAllVehicles()
@@ -108,7 +109,7 @@ object RaceUtils {
     }
 
     fun onPlayerLeaveGame(plr : Player){ // when player Disconnects
-        val VehicleManager = getVehicleManager()
+        val VehicleManager = getVehicleManager()!!
 
         if (RaceStarted == true && PlayersInRace.contains(plr)){
             //TODO: REJOIN GAME

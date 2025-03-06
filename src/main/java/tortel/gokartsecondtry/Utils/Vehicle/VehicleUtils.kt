@@ -49,12 +49,12 @@ object VehicleUtils {
 
     //TODO: ADD NEW ROTATION VARIABLE, CHANGE FROM vehicle.velocity TO vehicle.setdeltaspeed or some shi
 
-    fun getVehicleManager(): VehicleManager {
+    fun getVehicleManager(): VehicleManager? {
         return Main.vehicleManager
     }
 
     fun Brake(plr : Player){
-        val VehicleManager = getVehicleManager()
+        val VehicleManager = getVehicleManager()!!
         val Vehicle = VehicleManager.getVehicle(plr)
 
         if (Vehicle.velocity > 0.0 && !Vehicle.isDrifting){//Vehicle.isAccelerating
@@ -70,10 +70,12 @@ object VehicleUtils {
          */
 
     }
-
+    //TODO: FIX STOPPING AND STARTING RACE AGAIN MULTIPLIES THE STEERING :(
     fun SteerRight(plr : Player){
-        val VehicleManager = getVehicleManager()
+        val VehicleManager = getVehicleManager()!!
         val Vehicle = VehicleManager.getVehicle(plr)
+
+
         Vehicle.rotation.let { plrYawRotation ->
             if (Vehicle.isDrifting || Vehicle.velocity <= 0.0) return
 
@@ -99,7 +101,7 @@ object VehicleUtils {
     }
 
     fun SteerLeft(plr : Player){
-        val VehicleManager = getVehicleManager()
+        val VehicleManager = getVehicleManager()!!
         val Vehicle = VehicleManager.getVehicle(plr)
 
         Vehicle.rotation.let { plrYawRotation ->
@@ -126,9 +128,8 @@ object VehicleUtils {
 
     }
 
-    //TODO: FIX LETTING GO IF ANY OF DIRECTION KEYS(S/D) IT DOESNT STOP DRIFTINMG
     fun drift(plr : Player, KeyStates: KeyState){
-        val VehicleManager = getVehicleManager()
+        val VehicleManager = getVehicleManager()!!
         val Vehicle = VehicleManager.getVehicle(plr)
 
         val originalDriftingDir = Vehicle.DriftingDir
@@ -176,7 +177,7 @@ object VehicleUtils {
     }
 
     fun IncreaseVel(plr : Player){
-        val VehicleManager = getVehicleManager()
+        val VehicleManager = getVehicleManager()!!
         val Vehicle = VehicleManager.getVehicle(plr)
 
         Vehicle.velocity.let { plrvelocity ->
@@ -188,7 +189,7 @@ object VehicleUtils {
     }
 
     fun DecreaseVel(plr: Player) {
-        val VehicleManager = getVehicleManager()
+        val VehicleManager = getVehicleManager()!!
         val Vehicle = VehicleManager.getVehicle(plr)
 
         Vehicle.velocity.let { velocity ->
@@ -234,7 +235,7 @@ object VehicleUtils {
 
     fun spawnItemDisplay(worldname: String, plr : Player): List<ItemDisplay> {
         val VehicleManager = getVehicleManager()
-        val Vehicle = VehicleManager.getVehicle(plr)
+        val Vehicle = VehicleManager!!.getVehicle(plr)
 
         //10051 metal stuff
         //10052 wheel
@@ -315,7 +316,7 @@ object VehicleUtils {
         )
     }
     fun applyDriftingOffset(plr : Player, Velocity: Double, Horse: Entity, SpeedVector : Vector){
-        val VehicleManager = getVehicleManager()
+        val VehicleManager = getVehicleManager()!!
         val Vehicle = VehicleManager.getVehicle(plr)
 
 
@@ -350,7 +351,7 @@ object VehicleUtils {
     }
     //TODO: FIX TURNING/DRIFTING DIFFER FROM PERSON TO PERSON (FASTER/SLOWER)
     fun startVehicleTicking(){
-        val VehicleManager = getVehicleManager()
+        val VehicleManager = getVehicleManager()!!
 
         object : BukkitRunnable() {
             override fun run() {
@@ -371,10 +372,10 @@ object VehicleUtils {
                         drift(plr, playerKeyStates.get(plr)!!)
                     }
 
-                    if (Vehicle.steering == -1.0){
+                    if (Vehicle.steering <= -1.0){
                         SteerLeft(plr)
                     }
-                    if (Vehicle.steering == 1.0){
+                    if (Vehicle.steering >= 1.0){
                         SteerRight(plr)
                     }
 
@@ -394,7 +395,7 @@ object VehicleUtils {
                     Vehicle.VehicleItemDisplays[2].setRotation(Vehicle.rotation, 0.0f)
 
                     Vehicle.VehicleItemDisplays[0].teleport(Vehicle.VehicleHorse.location.add(CONSTANTS.KartOffset), TeleportFlag.EntityState.RETAIN_PASSENGERS)
-
+                    println(Vehicle.steering)
 
 
                     //FORCES
@@ -415,6 +416,6 @@ object VehicleUtils {
                 }
 
             }
-        }.runTaskTimer(Main.instance, 1, 1)
+        }.runTaskTimer(Main.instance!!, 1, 1)
     }
 }

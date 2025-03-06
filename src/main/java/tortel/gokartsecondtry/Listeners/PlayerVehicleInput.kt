@@ -35,7 +35,7 @@ class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(
         //detect if player moves //STEER_VEHICLE
         if (event.packetType == PacketType.Play.Client.STEER_VEHICLE){
             val plr = event.player
-            val VehicleManager = getVehicleManager()
+            val VehicleManager = getVehicleManager()!!
             val Vehicle = VehicleManager.getVehicle(plr)
 
             val forwardMovement = event.packet.float.read(1) // W/S
@@ -83,9 +83,8 @@ class PlayerVehicleInput(plugin : Plugin) : PacketAdapter(
 
             if (keyState.aPressed != newA) {
                 keyState.aPressed = newA
-
+                println("NEW A : $newA")
                 if (newA) {
-
 
                     toggleSteerLeft(plr, true)
                 } else {

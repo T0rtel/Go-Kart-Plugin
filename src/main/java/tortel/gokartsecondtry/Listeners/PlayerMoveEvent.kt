@@ -15,7 +15,7 @@ class PlayerMoveEvent : Listener {
        // println("${event.player} ${event.eventName} ${event.player.isInsideVehicle} ${event.player.isSneaking}")
         if (RaceUtils.RaceStarted){
             if (!plr.isInsideVehicle && RaceUtils.PlayersInRace.contains(plr)){
-                val VehicleManager = getVehicleManager()
+                val VehicleManager = getVehicleManager()!!
                 val Vehicle = VehicleManager.getVehicle(plr)
 
                  Vehicle.VehicleItemDisplays[0].addPassenger(plr)

@@ -8,7 +8,7 @@ import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.getVehicleManager
 object OnKeyToggle {
 
     fun ToggleAccelerate(plr: Player, accelerate : Boolean){
-        val VehicleManager = getVehicleManager()
+        val VehicleManager = getVehicleManager()!!
         val Vehicle = VehicleManager.getVehicle(plr)
 
 
@@ -16,30 +16,30 @@ object OnKeyToggle {
     }
 
     fun toggleSteerLeft(plr : Player, steer : Boolean){
-        val VehicleManager = getVehicleManager()
+        val VehicleManager = getVehicleManager()!!
         val Vehicle = VehicleManager.getVehicle(plr)
 
         if (steer){
-            Vehicle.steering = -1.0
+            Vehicle.steering -= 1.0
         }else{
-            Vehicle.steering = 0.0
+            Vehicle.steering += 1.0
         }
     }
 
     fun toggleSteerRight(plr : Player, steer : Boolean){
-        val VehicleManager = getVehicleManager()
+        val VehicleManager = getVehicleManager()!!
         val Vehicle = VehicleManager.getVehicle(plr)
 
 
         if (steer){
-            Vehicle.steering = 1.0
+            Vehicle.steering += 1.0
         }else{
-            Vehicle.steering = 0.0
+            Vehicle.steering -= 1.0
         }
     }
 
     fun toggleBrakes(plr : Player, brake : Boolean){
-        val VehicleManager = getVehicleManager()
+        val VehicleManager = getVehicleManager()!!
         val Vehicle = VehicleManager.getVehicle(plr)
 
 
@@ -48,7 +48,7 @@ object OnKeyToggle {
 
     //TODO: GOING ORIGINALLY RIGHT THEN CLICK ON LEFT STOPS DRIFTING
     fun toggleDrifting(plr : Player, sides : Float, drift : Boolean){
-        val VehicleManager = getVehicleManager()
+        val VehicleManager = getVehicleManager()!!
         val Vehicle = VehicleManager.getVehicle(plr)
 
 
