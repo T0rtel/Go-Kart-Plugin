@@ -73,7 +73,7 @@ class Main : JavaPlugin() {
 
     fun registerCommands(plugin: JavaPlugin){
         val lamp: Lamp<BukkitCommandActor> = BukkitLamp.builder(plugin)
-            .build()
+            .build()//e
 
         lamp.register(RaceCommand())
         lamp.register(GarageCommand())
