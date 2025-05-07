@@ -306,6 +306,7 @@ object VehicleUtils {
 
         //changed to ParticleBuilder for performance and my sanity, and changed dust plume to two black dust particles ->
         ParticleBuilder(org.bukkit.Particle.BLOCK).location(particleLoc).count(25).offset(0.35,0.1,0.35).data(particleData).spawn()
+        ParticleBuilder(org.bukkit.Particle.CAMPFIRE_COSY_SMOKE).location(particleLoc).count(4).offset(0.25,0.2,0.25).extra(0.0).spawn()
         ParticleBuilder(org.bukkit.Particle.DUST).offset(0.0,0.1,0.0).color(org.bukkit.Color.BLACK).location(
             Location(
                 particleLoc.world,
