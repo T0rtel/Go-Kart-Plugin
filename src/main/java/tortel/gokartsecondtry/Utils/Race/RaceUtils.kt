@@ -6,6 +6,7 @@ import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import tortel.gokartsecondtry.Main
 import tortel.gokartsecondtry.Utils.Race.RacingTracksConfigUtils.getTrackCoords
+import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils
 import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.getVehicleManager
 
 
@@ -33,7 +34,7 @@ object RaceUtils {
             }
         }.runTaskLater(Main.instance!!, 10)
 
-        //VehicleUtils.startRaceTicking()
+
 
         println("began race")
     }
