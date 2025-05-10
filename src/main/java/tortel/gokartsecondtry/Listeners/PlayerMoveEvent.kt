@@ -7,7 +7,7 @@ import tortel.gokartsecondtry.Utils.Race.RaceUtils
 import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils
 import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.getVehicleManager
 
-class PlayerMoveEvent : Listener {
+class       PlayerMoveEvent : Listener {
 
     @EventHandler
     fun onPunch(event : PlayerMoveEvent){

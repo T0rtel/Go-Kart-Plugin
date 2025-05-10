@@ -82,6 +82,9 @@ class Main : JavaPlugin() {
 
     private fun setupConfigsOnEnable() {
         config.set("plrcount", 0)
+            /*  if (config.contains("")) {
+
+        }*/
         saveConfig()
 
         RaceTracksConfig.load()

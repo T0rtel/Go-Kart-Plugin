@@ -129,6 +129,8 @@ object VehicleUtils {
     }
 
     fun drift(plr : Player, KeyStates: KeyState){
+
+
         val VehicleManager = getVehicleManager()!!
         val Vehicle = VehicleManager.getVehicle(plr)
 
@@ -371,6 +373,7 @@ object VehicleUtils {
     }
     //TODO: FIX TURNING/DRIFTING DIFFER FROM PERSON TO PERSON (FASTER/SLOWER)
     fun startVehicleTicking(){
+
         val VehicleManager = getVehicleManager()!!
 
         object : BukkitRunnable() {
@@ -378,7 +381,7 @@ object VehicleUtils {
                 if (!RaceStarted) return
                 for (plr in PlayersInRace) {
                     val Vehicle = VehicleManager.getVehicle(plr)
-
+                    Bukkit.broadcastMessage(Vehicle.velocity.toString())
                     // VELOCITY
                     if (Vehicle.isAccelerating){
                         IncreaseVel(plr)
