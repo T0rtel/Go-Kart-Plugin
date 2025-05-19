@@ -1,9 +1,12 @@
 package tortel.gokartsecondtry.Utils.Vehicle
 
+import com.destroystokyo.paper.ParticleBuilder
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
+import org.bukkit.util.Vector
 import tortel.gokartsecondtry.Main
 import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.DriftingStartOffset
 import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.MinSpeedToStartDrifting
@@ -60,48 +63,68 @@ object OnKeyToggle {
         Vehicle.rotation.let { lastRot ->
             if (drift && sides != 0.0f && Vehicle.velocity > MinSpeedToStartDrifting){
                 if (!Vehicle.isDrifting){
-                    Vehicle.isDrifting = true
-                    if (sides == -0.98f){
-                        Vehicle.DriftingDir = "right"
-                        Bukkit.broadcastMessage("right")
-                        //Crook\ Speed from drift
-                        Main.instance?.let {
-                            object : BukkitRunnable () {
-                                var cycles = 2
-                                var ticksPerCycle = 20
-                                var speedMax: Double = 0.6
-                                var speedAdded: Double = 0.0
-                                var SpeedTicks = 20
+                    Main.instance?.let {
+                        object : BukkitRunnable () {
+                            var cycles = 2
+                            var ticksPerCycle = 20
+                            var speedMax: Double = 0.6
+                            var speedAdded: Double = 0.0
+                            var SpeedTicks = 20
 
-                                var speedAddPerCycle: Double = speedMax/cycles
-                                var currentCycles = 0
-                                var i = 0
-                                override fun run() {
+                            var speedAddPerCycle: Double = speedMax/cycles
+                            var currentCycles = 0
+                            var i = 0
+                            override fun run() {
                                 if (i % ticksPerCycle == 0 &&  i < ticksPerCycle * cycles) {
                                     speedAdded += speedAddPerCycle
                                     currentCycles += 1
                                     plr.playSound(plr, Sound.BLOCK_TRIAL_SPAWNER_DETECT_PLAYER, 1f, 0.8f + (0.4f * currentCycles))
 
                                 }
-                                    if (!Vehicle.isDrifting) {
-                                        Vehicle.velocity += speedAdded
-                                        object : BukkitRunnable () {
-                                            var i = 0
-                                            override fun run() {
-                                                if (i > SpeedTicks) {
-                                                    this.cancel()
-                                                    Vehicle.velocity -= speedAdded
-                                                }
-                                                i +=1
+                                if (!Vehicle.isDrifting) {
+                                    Vehicle.velocity += speedAdded
+                                    object : BukkitRunnable () {
+                                        var i = 0
+                                        override fun run() {
+                                            if (i > SpeedTicks) {
+                                                this.cancel()
+                                                Vehicle.velocity -= speedAdded
                                             }
-                                        }.runTaskTimer(it,0,1)
+                                            val particleLoc = Vehicle.VehicleHorse.location.add(-Vehicle.VehicleHorse.location.direction.x * 3,1.2,-Vehicle.VehicleHorse.location.direction.z * 3)
+                                            val left: Vector = particleLoc.direction.clone().rotateAroundY(Math.toRadians(90.0)).multiply(0.6)
+                                            val right: Vector = particleLoc.direction.clone().rotateAroundY(Math.toRadians(-90.0)).multiply(0.6)
+                                            ParticleBuilder(org.bukkit.Particle.DUST_COLOR_TRANSITION).offset(0.2,0.2,0.2).colorTransition(org.bukkit.Color.YELLOW,org.bukkit.Color.RED).location(
+                                                Location(
+                                                    particleLoc.world,
+                                                    particleLoc.x +(left.x),
+                                                    particleLoc.y,
+                                                    particleLoc.z +(left.x)
+                                                )
+                                            ).count(5).spawn()
+                                            ParticleBuilder(org.bukkit.Particle.DUST_COLOR_TRANSITION).offset(0.2,0.2,0.2).colorTransition(org.bukkit.Color.YELLOW,org.bukkit.Color.RED).location(
+                                                Location(
+                                                    particleLoc.world,
+                                                    particleLoc.x +(right.x),
+                                                    particleLoc.y,
+                                                    particleLoc.z +(right.x)
+                                                )
+                                            ).count(5).spawn()
+                                            i +=1
+                                        }
+                                    }.runTaskTimer(it,0,1)
 
-                                        this.cancel()
-                                    }
-                                    i +=1
+                                    this.cancel()
                                 }
-                            }.runTaskTimer(it, 0, 1)
-                        }
+                                i +=1
+                            }
+                        }.runTaskTimer(it, 0, 1)
+                    }
+                    Vehicle.isDrifting = true
+                    if (sides == -0.98f){
+                        Vehicle.DriftingDir = "right"
+                        Bukkit.broadcastMessage("right")
+                        //Crook\ Speed from drift
+
                         Vehicle.rotation = lastRot + DriftingStartOffset
 
                         // println("started originally right")

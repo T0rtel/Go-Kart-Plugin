@@ -12,7 +12,6 @@ class VehicleManager {
     fun getVehicle(player: Player): Vehicle {
         return vehicles.computeIfAbsent(player.uniqueId) { Vehicle(player) }
     }
-
     fun VehicleExists(player: Player) : Boolean{
         if (vehicles.contains(player.uniqueId)){
             return true

@@ -217,7 +217,8 @@ object VehicleUtils {
         Horse.isCollidable = false
         Horse.isPersistent = true
         Horse.removeWhenFarAway = false
-
+        Horse.addScoreboardTag("kart")
+        Horse.addScoreboardTag(plr.uniqueId.toString())
         Horse.setBaby()
         Horse.isTamed = true
         Horse.owner = plr
@@ -381,7 +382,6 @@ object VehicleUtils {
                 if (!RaceStarted) return
                 for (plr in PlayersInRace) {
                     val Vehicle = VehicleManager.getVehicle(plr)
-                    Bukkit.broadcastMessage(Vehicle.velocity.toString())
                     // VELOCITY
                     if (Vehicle.isAccelerating){
                         IncreaseVel(plr)
@@ -418,7 +418,6 @@ object VehicleUtils {
                     Vehicle.VehicleItemDisplays[2].setRotation(Vehicle.rotation, 0.0f)
 
                     Vehicle.VehicleItemDisplays[0].teleport(Vehicle.VehicleHorse.location.add(CONSTANTS.KartOffset), TeleportFlag.EntityState.RETAIN_PASSENGERS)
-                    println(Vehicle.steering)
 
 
                     //FORCES
