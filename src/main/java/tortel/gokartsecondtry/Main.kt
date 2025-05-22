@@ -6,6 +6,7 @@ import com.comphenix.protocol.ProtocolManager
 import com.mongodb.client.MongoDatabase
 import org.bukkit.Bukkit
 import org.bukkit.entity.EntityType
+import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
 import revxrsal.commands.Lamp
@@ -27,6 +28,9 @@ class Main : JavaPlugin() {
     private var protocolManager: ProtocolManager? = null
 
     companion object {
+        fun dataFolder(): File {
+            return this.dataFolder()
+        }
         var dataFolderDir: File = File("")
             private set
         var instance: JavaPlugin? = null
@@ -60,10 +64,10 @@ class Main : JavaPlugin() {
         saveConfigsOnDisable()
         RaceUtils.stopRace("whateva")
     }
-
     fun registerEvents(){
         protocolManager!!.addPacketListener(PlayerVehicleInput(this))
         //protocolManager!!.addPacketListener(UnHeldKeyEvent(this))
+        pluginmanager.registerEvents(PlayerInventoryInput(), this)
         pluginmanager.registerEvents(PlayerJoinLeaveEvent(), this)
         pluginmanager.registerEvents(PlayerQuitVehicle(), this)
         pluginmanager.registerEvents(PlayerMoveEvent(), this)
@@ -82,6 +86,9 @@ class Main : JavaPlugin() {
 
     private fun setupConfigsOnEnable() {
         config.set("plrcount", 0)
+            /*  if (config.contains("")) {
+
+        }*/
         saveConfig()
 
         RaceTracksConfig.load()

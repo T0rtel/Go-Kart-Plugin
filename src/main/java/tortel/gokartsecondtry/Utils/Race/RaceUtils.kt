@@ -1,12 +1,16 @@
 package tortel.gokartsecondtry.Utils.Race
 
 
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes.player
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import tortel.gokartsecondtry.Main
 import tortel.gokartsecondtry.Utils.Race.RacingTracksConfigUtils.getTrackCoords
+import tortel.gokartsecondtry.Utils.ScoreHelper
 import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.getVehicleManager
+import tortel.gokartsecondtry.data.Checkpoint
+import tortel.gokartsecondtry.data.Memory
 
 
 object RaceUtils {
@@ -30,12 +34,50 @@ object RaceUtils {
         object : BukkitRunnable() {
             override fun run() {
                 spawnVehicles(TrackName)
+                raceTick(TrackName)
             }
         }.runTaskLater(Main.instance!!, 10)
 
-        //VehicleUtils.startRaceTicking()
+
 
         println("began race")
+    }
+
+    fun raceTick(RaceName: String) {
+        val b : HashMap<Int, Checkpoint> = Memory.server?.checkpoint?.get(RaceName)?.associateBy { it.number } as HashMap<Int, Checkpoint>
+        val finish : Checkpoint = Memory.server?.finishLine?.get(RaceName)!!
+        for (player in PlayersInRace) {
+            Memory.getPlayerMemory(player)?.racePos = 0
+            Memory.getPlayerMemory(player)?.laps = 0
+            //create initial scoreboard
+            val helper = ScoreHelper.createScore(player)
+            helper.setTitle("&aCLOBBING YOUR NETWORK")
+            helper.setSlot(5, "&7&m--------------------------------")
+            helper.setSlot(4, "&aPosition: ${PlayersInRace.size}/${PlayersInRace.size}")
+            helper.setSlot(3,"&aLap: ${Memory.getPlayerMemory(player)?.laps}")
+            helper.setSlot(2, "clobber.com")
+            helper.setSlot(1, "&7&m--------------------------------")
+        }
+
+        object : BukkitRunnable() {
+            override fun run() {
+                val sortedPlayers = PlayersInRace.sortedByDescending { Memory.getPlayerMemory(it)?.racePos }
+                val positions = mutableMapOf<Player, Int>()
+                sortedPlayers.forEachIndexed { index, player ->
+                    positions[player] = index + 1
+                }
+
+                //update scoreboard
+                for (player in PlayersInRace) {
+                    if (ScoreHelper.hasScore(player)) {
+                        val helper = ScoreHelper.getByPlayer(player)
+                    player.sendMessage("yes")
+                        helper?.setSlot(4, "&aPosition: ${positions[player]}/${PlayersInRace.size}")
+                        helper?.setSlot(3, "&aLap: ${Memory.getPlayerMemory(player)?.laps}")
+                    }
+                }
+            }
+        }.runTaskTimer(Main.instance!!, 0, 5 )
     }
 
     fun stopRace(RaceName : String){
@@ -71,7 +113,6 @@ object RaceUtils {
             if (players.isEmpty()) return
 
             val selectedplr: Player = players.random()
-
 
             chosenPlayers.add(selectedplr.name)
 

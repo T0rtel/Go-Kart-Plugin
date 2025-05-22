@@ -1,6 +1,7 @@
 package tortel.gokartsecondtry.Utils.Vehicle
 
 
+import com.destroystokyo.paper.ParticleBuilder
 import io.papermc.paper.entity.TeleportFlag
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -10,9 +11,8 @@ import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.Vector
 import tortel.gokartsecondtry.Main
 import tortel.gokartsecondtry.Utils.CONSTANTS
-import tortel.gokartsecondtry.Utils.Race.RaceUtils.RaceStarted
 import tortel.gokartsecondtry.Utils.Race.RaceUtils.PlayersInRace
-import tortel.gokartsecondtry.Vehicle.Vehicle
+import tortel.gokartsecondtry.Utils.Race.RaceUtils.RaceStarted
 import tortel.gokartsecondtry.Vehicle.VehicleManager
 import kotlin.math.cos
 import kotlin.math.sin
@@ -129,6 +129,8 @@ object VehicleUtils {
     }
 
     fun drift(plr : Player, KeyStates: KeyState){
+
+
         val VehicleManager = getVehicleManager()!!
         val Vehicle = VehicleManager.getVehicle(plr)
 
@@ -215,7 +217,8 @@ object VehicleUtils {
         Horse.isCollidable = false
         Horse.isPersistent = true
         Horse.removeWhenFarAway = false
-
+        Horse.addScoreboardTag("kart")
+        Horse.addScoreboardTag(plr.uniqueId.toString())
         Horse.setBaby()
         Horse.isTamed = true
         Horse.owner = plr
@@ -296,14 +299,34 @@ object VehicleUtils {
 
 
     }
-    //TODO: SMOKE PARTICLE WHEN DRIFTING
+
     fun DriftParticle(Vehicle : Entity){
         val blockBelow = Vehicle.location.subtract(0.0, 1.0, 0.0).block
         val particleLoc = Vehicle.location.add(-Vehicle.location.direction.x,0.0,-Vehicle.location.direction.z)
-
+        val left: Vector = particleLoc.direction.clone().rotateAroundY(Math.toRadians(90.0)).multiply(0.6)
+        val right: Vector = particleLoc.direction.clone().rotateAroundY(Math.toRadians(-90.0)).multiply(0.6)
         val particleData = blockBelow.blockData
-        Vehicle.world.spawnParticle(org.bukkit.Particle.BLOCK, particleLoc, 25, 0.35, 0.1, 0.35, particleData)
-        Vehicle.world.spawnParticle(org.bukkit.Particle.DUST_PLUME, particleLoc, 1, 0.0, 0.0, 0.0)
+
+        //changed to ParticleBuilder for performance and my sanity, and changed dust plume to two black dust particles ->
+        ParticleBuilder(org.bukkit.Particle.BLOCK).location(particleLoc).count(25).offset(0.35,0.1,0.35).data(particleData).spawn()
+        ParticleBuilder(org.bukkit.Particle.CAMPFIRE_COSY_SMOKE).location(particleLoc).count(4).offset(0.25,0.2,0.25).extra(0.0).spawn()
+        ParticleBuilder(org.bukkit.Particle.DUST).offset(0.0,0.1,0.0).color(org.bukkit.Color.BLACK).location(
+            Location(
+                particleLoc.world,
+                particleLoc.x +(left.x),
+                particleLoc.y,
+                particleLoc.z +(left.x)
+            )).count(2).spawn()
+        ParticleBuilder(org.bukkit.Particle.DUST).offset(0.0,0.1,0.0).color(org.bukkit.Color.BLACK).location(
+            Location(
+                particleLoc.world,
+                particleLoc.x +(right.x),
+                particleLoc.y,
+                particleLoc.z +(right.x)
+            )).count(2).spawn()
+
+        //Vehicle.world.spawnParticle(org.bukkit.Particle.BLOCK, particleLoc, 25, 0.35, 0.1, 0.35, particleData)
+        //Vehicle.world.spawnParticle(org.bukkit.Particle.DUST_PLUME, particleLoc, 1, 0.0, 0.0, 0.0)
         //plr.world.spawnParticle(org.bukkit.Particle.DUST_PLUME, Horse.location, 50, 0.0, 0.1 ,0.0)
 
     }
@@ -351,6 +374,7 @@ object VehicleUtils {
     }
     //TODO: FIX TURNING/DRIFTING DIFFER FROM PERSON TO PERSON (FASTER/SLOWER)
     fun startVehicleTicking(){
+
         val VehicleManager = getVehicleManager()!!
 
         object : BukkitRunnable() {
@@ -358,7 +382,6 @@ object VehicleUtils {
                 if (!RaceStarted) return
                 for (plr in PlayersInRace) {
                     val Vehicle = VehicleManager.getVehicle(plr)
-
                     // VELOCITY
                     if (Vehicle.isAccelerating){
                         IncreaseVel(plr)
@@ -395,7 +418,6 @@ object VehicleUtils {
                     Vehicle.VehicleItemDisplays[2].setRotation(Vehicle.rotation, 0.0f)
 
                     Vehicle.VehicleItemDisplays[0].teleport(Vehicle.VehicleHorse.location.add(CONSTANTS.KartOffset), TeleportFlag.EntityState.RETAIN_PASSENGERS)
-                    println(Vehicle.steering)
 
 
                     //FORCES
