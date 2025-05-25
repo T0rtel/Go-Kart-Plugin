@@ -1,0 +1,6 @@
+name: gokartsecondtry-Gradle
+version: '1.0-SNAPSHOT'
+main: tortel.gokartsecondtry.Main
+api-version: '1.21'
+
+depend: [ProtocolLib]
