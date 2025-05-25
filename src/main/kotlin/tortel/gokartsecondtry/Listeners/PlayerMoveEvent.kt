@@ -25,7 +25,6 @@ class PlayerMoveEvent : Listener {
                 val world: String = event.to.world.name
                 // Bukkit.broadcastMessage(world)
                 val a: MutableList<Checkpoint> = server?.checkpoint?.get(world)!!
-                Bukkit.broadcastMessage("all checlpoints : ${a.size}")
                 a.add(server?.finishLine?.get(world)!!)
 
                 for (ch in a) {
@@ -60,7 +59,9 @@ class PlayerMoveEvent : Listener {
                                         it.racePos +=1
                                     }
                                 }
+                                Bukkit.broadcastMessage("${plr?.name} crossed checkpoint ${ch.number} at ${to.x}, ${to.y}, ${to.z} in world ${event.to.world.name}")
                             }
+
                         }
                     } else {
                         //checking player crossed checkpoint line
@@ -89,6 +90,7 @@ class PlayerMoveEvent : Listener {
                                         it.racePos +=1
                                     }
                                 }
+                                Bukkit.broadcastMessage("${plr?.name} crossed! checkpoint ${ch.number} at ${to.x}, ${to.y}, ${to.z} in world ${event.to.world.name}")
                             }
                         }
 

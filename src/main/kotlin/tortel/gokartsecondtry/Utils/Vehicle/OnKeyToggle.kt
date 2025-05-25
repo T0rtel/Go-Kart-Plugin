@@ -61,9 +61,10 @@ object OnKeyToggle {
         Vehicle.rotation.let { lastRot ->
             if (drift && sides != 0.0f && Vehicle.velocity > MinSpeedToStartDrifting){
                 if (!Vehicle.isDrifting){
+                    Bukkit.broadcastMessage("started drifting")
                     Main.instance?.let {
                         object : BukkitRunnable () {
-                            var cycles = 2
+                            var cycles = 3
                             var ticksPerCycle = 20
                             var speedMax: Double = 0.6
                             var speedAdded: Double = 0.0
@@ -107,7 +108,7 @@ object OnKeyToggle {
                                                     particleLoc.z +(right.x)
                                                 )
                                             ).count(5).spawn()
-                                            println("drift 1")
+                                            //println("drift 1")
                                             i +=1
                                         }
                                     }.runTaskTimer(it,0,1)
@@ -130,6 +131,7 @@ object OnKeyToggle {
                     }
                     if (sides == 0.98f){
                         Vehicle.DriftingDir = "left"
+                        Bukkit.broadcastMessage("left")
 
                         Vehicle.rotation = lastRot - DriftingStartOffset
 

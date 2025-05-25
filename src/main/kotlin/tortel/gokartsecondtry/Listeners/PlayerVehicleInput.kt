@@ -1,5 +1,6 @@
 package tortel.gokartsecondtry.Listeners
 
+import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInputEvent
@@ -16,7 +17,7 @@ import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.getVehicleManager
 
 class PlayerVehicleInput(plugin : Plugin) : Listener {
     @EventHandler
-    fun onMove(event : PlayerInputEvent){
+    fun onInput(event : PlayerInputEvent){
         val plr = event.player
         val VehicleManager = getVehicleManager()!!
         if (plr.isInsideVehicle && VehicleManager.isEntityInVehicle(plr)) {
@@ -30,12 +31,11 @@ class PlayerVehicleInput(plugin : Plugin) : Listener {
             val newD = sidewardMovement < 0
             val jumpMovement = input.isJump
             val keyState = Vehicle.playerKeyState
-            println(keyState)
+
             if (keyState.wPressed != newW) {
                 keyState.wPressed = newW
 
                 if (newW) {
-
                     ToggleAccelerate(plr, true)
                 } else {
 
@@ -47,22 +47,22 @@ class PlayerVehicleInput(plugin : Plugin) : Listener {
                 keyState.sPressed = newS
 
                 if (newS) {
-                    if (sidewardMovement != 0.0f){
-                        toggleDrifting(plr, sidewardMovement, true)
-                    }else{
-                        toggleBrakes(plr, true)
-                    }
+//                    if (sidewardMovement != 0.0f){
+//                        toggleDrifting(plr, sidewardMovement, true)
+//                    }else{
+//                        toggleBrakes(plr, true)
+//                    }
+                    toggleBrakes(plr, true)
 
                 } else {
 
-                    toggleDrifting(plr, sidewardMovement, false)
+                    //toggleDrifting(plr, sidewardMovement, false)
                     toggleBrakes(plr, false)
                 }
             }
 
             if (keyState.aPressed != newA) {
                 keyState.aPressed = newA
-                println("NEW A : $newA")
                 if (newA) {
 
                     toggleSteerLeft(plr, true)
@@ -76,7 +76,6 @@ class PlayerVehicleInput(plugin : Plugin) : Listener {
                 keyState.dPressed = newD
 
                 if (newD) {
-
                     toggleSteerRight(plr, true)
                 } else {
 
@@ -84,6 +83,16 @@ class PlayerVehicleInput(plugin : Plugin) : Listener {
                 }
             }
 
+            if (keyState.jumpPressed != jumpMovement) {
+                keyState.jumpPressed = jumpMovement
+
+                if (jumpMovement) {
+                    toggleDrifting(plr, sidewardMovement, true)
+
+                }else{
+                    toggleDrifting(plr, sidewardMovement, false)
+                }
+            }
         }
     }
 }

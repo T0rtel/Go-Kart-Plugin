@@ -182,6 +182,7 @@ object VehicleUtils {
     fun IncreaseVel(plr : Player){
         val VehicleManager = getVehicleManager()!!
         val Vehicle = VehicleManager.getVehicle(plr)
+        if (Vehicle.isDrifting) return
 
         Vehicle.velocity.let { plrvelocity ->
             if (plrvelocity < MaxSpeed) {
