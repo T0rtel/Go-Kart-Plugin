@@ -18,7 +18,7 @@ import tortel.gokartsecondtry.Utils.Race.RacingTracksConfigUtils
 
 @Command("racepos")
 @Description("Sets the racers positions when race starts.")
-class   RacePosCommands {
+class RacePosCommands {
 
     @Subcommand("debug")
     fun debug(sender: Player) {
@@ -28,7 +28,6 @@ class   RacePosCommands {
         for (ch in Memory.server?.checkpoint?.get(sender.world.name)!!) {
             Bukkit.broadcastMessage(ch.number.toString())
         }
-
 
     }
 

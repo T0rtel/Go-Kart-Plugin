@@ -1,8 +1,5 @@
 package tortel.gokartsecondtry
 
-import com.comphenix.protocol.ProtocolLibrary
-import com.comphenix.protocol.ProtocolManager
-
 import com.mongodb.client.MongoDatabase
 import org.bukkit.Bukkit
 import org.bukkit.entity.EntityType
@@ -66,6 +63,7 @@ class Main : JavaPlugin() {
     fun registerEvents(){
        // protocolManager!!.addPacketListener(PlayerVehicleInput(this))
         //protocolManager!!.addPacketListener(UnHeldKeyEvent(this))
+        pluginmanager.registerEvents(PlayerVehicleInput(this), this)
         pluginmanager.registerEvents(PlayerInventoryInput(), this)
         pluginmanager.registerEvents(PlayerJoinLeaveEvent(), this)
         pluginmanager.registerEvents(PlayerQuitVehicle(), this)

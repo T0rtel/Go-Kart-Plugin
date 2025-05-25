@@ -58,8 +58,6 @@ object OnKeyToggle {
         val VehicleManager = getVehicleManager()!!
         val Vehicle = VehicleManager.getVehicle(plr)
 
-
-
         Vehicle.rotation.let { lastRot ->
             if (drift && sides != 0.0f && Vehicle.velocity > MinSpeedToStartDrifting){
                 if (!Vehicle.isDrifting){
@@ -109,6 +107,7 @@ object OnKeyToggle {
                                                     particleLoc.z +(right.x)
                                                 )
                                             ).count(5).spawn()
+                                            println("drift 1")
                                             i +=1
                                         }
                                     }.runTaskTimer(it,0,1)

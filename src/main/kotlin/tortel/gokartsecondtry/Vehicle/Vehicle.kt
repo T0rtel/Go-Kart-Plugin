@@ -4,6 +4,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import tortel.gokartsecondtry.Utils.Race.RaceUtils.PlayersInRace
+import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils
 import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.spawnHorse
 import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.spawnItemDisplay
 
@@ -11,6 +12,7 @@ import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.spawnItemDisplay
 class Vehicle(private val player: Player) {
     lateinit var VehicleHorse : Entity
     lateinit var VehicleItemDisplays : List<Entity>
+    lateinit var playerKeyState : VehicleUtils.KeyState
 
     val owner = player
 
@@ -29,12 +31,13 @@ class Vehicle(private val player: Player) {
     fun spawn(TrackName : String) {
         // Logic to spawn the vehicle for the player
         player.sendMessage("Kart spawned!")
-
-        VehicleHorse = spawnHorse(TrackName, player)
-        VehicleItemDisplays = spawnItemDisplay(TrackName, player)
-
-        //VehicleHorse = Horse
-        //VehicleItemDisplays = ItemDisplays
+        try {
+            VehicleHorse = spawnHorse(TrackName, player)
+            VehicleItemDisplays = spawnItemDisplay(TrackName, player)
+            playerKeyState = VehicleUtils.KeyState()
+        }catch (e : Exception){
+            Bukkit.getLogger().warning("Failed to spawn vehicle for player ${player.name}: ${e.message}")
+        }
 
         PlayersInRace.add(player)
     }
@@ -42,8 +45,10 @@ class Vehicle(private val player: Player) {
     // Example: Despawn the vehicle
     fun despawn() {
         // Logic to despawn the vehicle
+        player.sendMessage("e")
         VehicleHorse.remove()
         VehicleItemDisplays.forEach { it.remove() }
+        playerKeyState = VehicleUtils.KeyState() // Reset key state
         player.sendMessage("Kart despawned!")
     }
 }

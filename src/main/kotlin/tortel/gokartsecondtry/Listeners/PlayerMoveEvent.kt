@@ -25,6 +25,7 @@ class PlayerMoveEvent : Listener {
                 val world: String = event.to.world.name
                 // Bukkit.broadcastMessage(world)
                 val a: MutableList<Checkpoint> = server?.checkpoint?.get(world)!!
+                Bukkit.broadcastMessage("all checlpoints : ${a.size}")
                 a.add(server?.finishLine?.get(world)!!)
 
                 for (ch in a) {

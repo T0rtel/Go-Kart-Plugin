@@ -24,9 +24,9 @@ object VehicleUtils {
         var wPressed : Boolean = false,
         var aPressed : Boolean = false,
         var sPressed: Boolean = false,
-        var dPressed : Boolean = false
+        var dPressed : Boolean = false,
+        var jumpPressed : Boolean = false
     )
-    val playerKeyStates = mutableMapOf<Player, KeyState>()
 
     //driving
     val Acceleration = 0.05 //per tick
@@ -52,6 +52,7 @@ object VehicleUtils {
     fun getVehicleManager(): VehicleManager? {
         return Main.vehicleManager
     }
+
 
     fun Brake(plr : Player){
         val VehicleManager = getVehicleManager()!!
@@ -306,7 +307,7 @@ object VehicleUtils {
         val left: Vector = particleLoc.direction.clone().rotateAroundY(Math.toRadians(90.0)).multiply(0.6)
         val right: Vector = particleLoc.direction.clone().rotateAroundY(Math.toRadians(-90.0)).multiply(0.6)
         val particleData = blockBelow.blockData
-
+        println("drift 2")
         //changed to ParticleBuilder for performance and my sanity, and changed dust plume to two black dust particles ->
         ParticleBuilder(org.bukkit.Particle.BLOCK).location(particleLoc).count(25).offset(0.35,0.1,0.35).data(particleData).spawn()
         ParticleBuilder(org.bukkit.Particle.CAMPFIRE_COSY_SMOKE).location(particleLoc).count(4).offset(0.25,0.2,0.25).extra(0.0).spawn()
@@ -343,8 +344,8 @@ object VehicleUtils {
         val Vehicle = VehicleManager.getVehicle(plr)
 
 
-        val keys = playerKeyStates.get(plr)
-        if (!keys!!.dPressed && !keys.aPressed) {// player let go of both a and d key
+        val keys = Vehicle.playerKeyState
+        if (!keys.dPressed && !keys.aPressed) {// player let go of both a and d key
             DecreaseVel(plr)
             applyAccVelocity(Velocity, Horse, SpeedVector)
             return
@@ -392,7 +393,7 @@ object VehicleUtils {
                     }
                     if (Vehicle.isDrifting){
                         //TODO: ADD DRIFTING
-                        drift(plr, playerKeyStates.get(plr)!!)
+                        drift(plr, Vehicle.playerKeyState)
                     }
 
                     if (Vehicle.steering <= -1.0){

@@ -44,8 +44,8 @@ object RaceUtils {
     }
 
     fun raceTick(RaceName: String) {
-        val b : HashMap<Int, Checkpoint> = Memory.server?.checkpoint?.get(RaceName)?.associateBy { it.number } as HashMap<Int, Checkpoint>
-        val finish : Checkpoint = Memory.server?.finishLine?.get(RaceName)!!
+        //val b : HashMap<Int, Checkpoint> = Memory.server?.checkpoint?.get(RaceName)?.associateBy { it.number } as HashMap<Int, Checkpoint>
+        //val finish : Checkpoint = Memory.server?.finishLine?.get(RaceName)!!
         for (player in PlayersInRace) {
             Memory.getPlayerMemory(player)?.racePos = 0
             Memory.getPlayerMemory(player)?.laps = 0
@@ -71,7 +71,7 @@ object RaceUtils {
                 for (player in PlayersInRace) {
                     if (ScoreHelper.hasScore(player)) {
                         val helper = ScoreHelper.getByPlayer(player)
-                    player.sendMessage("yes")
+                    //player.sendMessage("yes")
                         helper?.setSlot(4, "&aPosition: ${positions[player]}/${PlayersInRace.size}")
                         helper?.setSlot(3, "&aLap: ${Memory.getPlayerMemory(player)?.laps}")
                     }

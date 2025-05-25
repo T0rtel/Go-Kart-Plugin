@@ -32,4 +32,8 @@ class VehicleManager {
         vehicles.values.forEach { it.despawn() }
         vehicles.clear()
     }
+
+    fun isEntityInVehicle(entity: Player): Boolean {
+        return vehicles.containsKey(entity.uniqueId)
+    }
 }
