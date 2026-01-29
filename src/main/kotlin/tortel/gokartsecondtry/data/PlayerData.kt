@@ -4,7 +4,6 @@ import org.bukkit.util.Vector
 
 class PlayerData {
     //-------AdminData
-    var inRace : Boolean = false
     var StartedStart : Boolean = false
     var direction : Boolean = false
     var length: Int = 1
@@ -14,4 +13,12 @@ class PlayerData {
     //--------PlayerData
     var racePos: Int = 0
     var laps: Int = 0
+    var inRace : Boolean = false
+    var raceID : String = ""
+    var tempTrackQueue : String = ""
+    var boosting : Boolean = false
+    var time : Double = 0.0
+    var lapTime: Double = 0.0
+    var currentItem : String = ""
+    var shields = 0
 }

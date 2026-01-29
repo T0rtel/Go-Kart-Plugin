@@ -1,14 +1,11 @@
 package tortel.gokartsecondtry.data
 
 import org.bukkit.Bukkit
-import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
-import org.bukkit.util.Vector
 import tortel.gokartsecondtry.Main
 import java.io.File
-import java.util.ArrayList
 
 object RaceTracksConfig {
 
@@ -28,48 +25,22 @@ object RaceTracksConfig {
             FileDoesntExist()
         }
 
-        config = YamlConfiguration()
+        config = YamlConfiguration.loadConfiguration(file)
         //config.options().parseComments(true)
 
         try {
-            //config.save(file)
-            config.load(file)
-            config.set("working", true)
-            save()
-            Main.instance?.logger?.info("RACETRACKS Config Setup Status : ${config.get("working")}")
-            val config = RaceTracksConfig.getConfig()
+            Bukkit.broadcastMessage("sigmammamamamaa")
             for (raceTrack in Bukkit.getWorlds().map(World::getName)) {
-                val checkpoints = config.getConfigurationSection("racetracks.$raceTrack.C") ?: return
-                val checkList : MutableList<Checkpoint> = ArrayList()
-                checkpoints.getKeys(false).forEach { key ->
-                    val length = config.getInt("racetracks.$raceTrack.C.$key.length")
-                    val direction = config.getString("racetracks.$raceTrack.C.$key.dir") == "z"
-                    val x = config.getDouble("racetracks.$raceTrack.C.$key.x")
-                    val y = config.getDouble("racetracks.$raceTrack.C.$key.y")
-                    val z = config.getDouble("racetracks.$raceTrack.C.$key.z")
-
-                    val x2 = config.getDouble("racetracks.$raceTrack.C.$key.V.x")
-                    val y2 = config.getDouble("racetracks.$raceTrack.C.$key.V.y")
-                    val z2 = config.getDouble("racetracks.$raceTrack.C.$key.V.z")
-                    val vector = Vector(x2,y2,z2)
-
-                    val checkpoint = Checkpoint(Location(Bukkit.getWorld(raceTrack), x, y, z), length, direction, vector, key.toInt())
-                    checkList.add(checkpoint)
+                Bukkit.getLogger().warning(raceTrack + " fuhsndgf][dasg][vkopsdfds" + config.name + " s  " + config.currentPath)
+                val va = config.get("raceData.track.$raceTrack")
+                if (va != null) {
+                    Memory.server?.raceData?.put(raceTrack,(va as RaceData))
+                    Bukkit.getLogger().warning("pass2 ----------------------------------------------------------------------------------------------------")
+                }else {
+                    Bukkit.getLogger().warning("Key not found for race track: $raceTrack")
                 }
-                val length = config.getInt("racetracks.$raceTrack.start.length")
-                val direction = config.getString("racetracks.$raceTrack.start.dir") == "z"
-                val x = config.getDouble("racetracks.$raceTrack.start.x")
-                val y = config.getDouble("racetracks.$raceTrack.start.y")
-                val z = config.getDouble("racetracks.$raceTrack.start.z")
-                val x2 = config.getDouble("racetracks.$raceTrack.start.V.x")
-                val y2 = config.getDouble("racetracks.$raceTrack.start.V.y")
-                val z2 = config.getDouble("racetracks.$raceTrack.start.V.z")
-                val vector = Vector(x2,y2,z2)
-                val checkpoint = Checkpoint(Location(Bukkit.getWorld(raceTrack), x, y, z), length, direction, vector, 0)
-
-                Memory.server?.finishLine?.put(raceTrack, checkpoint)
-                Memory.server?.checkpoint?.put(raceTrack,checkList)
             }
+
                 //RacingTracksConfigUtils.loadRacingTracksConfig()
                 //Main.instance?.logger?.info("${config.get("cached.TTortel.discordId")}")
             } catch (e:Exception){
@@ -98,6 +69,9 @@ object RaceTracksConfig {
     fun save(){
         try{
             //config.set("working", false)
+            for (aaa in Memory.server?.raceData?.keys!!) {
+                config.set("raceData.track.$aaa", Memory.server?.raceData?.get(aaa))
+            }
             config.save(file)
         }catch (e: Exception){
             e.printStackTrace()

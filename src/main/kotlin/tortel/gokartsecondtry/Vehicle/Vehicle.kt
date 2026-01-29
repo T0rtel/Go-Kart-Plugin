@@ -3,7 +3,6 @@ package tortel.gokartsecondtry.Vehicle
 import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
-import tortel.gokartsecondtry.Utils.Race.RaceUtils.PlayersInRace
 import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils
 import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.spawnHorse
 import tortel.gokartsecondtry.Utils.Vehicle.VehicleUtils.spawnItemDisplay
@@ -18,7 +17,7 @@ class Vehicle(private val player: Player) {
 
     var velocity = 0.0
     var rotation = 0.0f
-
+    var stopped = false
     var isAccelerating = false
     var isBraking = false
     var isDrifting = false
@@ -39,7 +38,7 @@ class Vehicle(private val player: Player) {
             Bukkit.getLogger().warning("Failed to spawn vehicle for player ${player.name}: ${e.message}")
         }
 
-        PlayersInRace.add(player)
+
     }
 
     // Example: Despawn the vehicle

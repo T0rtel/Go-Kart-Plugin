@@ -23,15 +23,27 @@ class RacePosCommands {
     @Subcommand("debug")
     fun debug(sender: Player) {
         if (!sender.isOp) return
-        val a : Int = Memory.server?.checkpoint?.get(sender.world.name)?.size!!
+        val a : Int = Memory.server?.raceData?.get(sender.world.name)?.checkpoint?.size!!
     Bukkit.broadcastMessage("$a")
-        for (ch in Memory.server?.checkpoint?.get(sender.world.name)!!) {
+        for (ch in Memory.server?.raceData?.get(sender.world.name)?.checkpoint!!) {
             Bukkit.broadcastMessage(ch.number.toString())
         }
 
     }
-
-
+    @Subcommand("add itembox")
+    fun addboxpos(sender: Player) {
+        if (!sender.isOp) return
+        val loc = sender.location.block.location.add(0.5,0.0,0.5)
+        Memory.server?.raceData?.get(sender.world.name)?.itemboxes?.add(loc)
+        sender.sendMessage("Successfully added a itembox at $loc")
+    }
+    @Subcommand("remove itembox")
+    fun delboxpos(sender: Player) {
+        if (!sender.isOp) return
+        val loc = sender.location.block.location.add(0.5,0.0,0.5)
+        Memory.server?.raceData?.get(sender.world.name)?.itemboxes?.remove(loc)
+        sender.sendMessage("Successfully removed a itembox at $loc")
+    }
     @Subcommand("add racer")
     fun addRacePos(sender: Player, racerNumber: Int) {
         if (!sender.isOp) return
@@ -86,8 +98,11 @@ class RacePosCommands {
             }
         }
     }
+
+
+
     @Subcommand("add checkpoint")
-    fun addCheckpointPos(sender: Player) {
+    fun addCheckpointPos(sender: Player,racerNumber: Int) {
         if (!sender.isOp) return
 
         if (Memory.getPlayerMemory(sender)?.StartedStart == false) {
@@ -116,13 +131,23 @@ class RacePosCommands {
             }.runTaskTimer(Main.instance!!, 0, 5)
         } else {
             val loc = sender.getTargetBlock(20)?.getLocation()!!
-            val replaced = RacingTracksConfigUtils.addCheckpointPos(loc, sender)
+
             Memory.getPlayerMemory(sender)?.StartedStart = false
-            var num : Int = 0
-            for (ch in Memory.server?.checkpoint?.get(loc.world.name)!!) {
-                num +=1
+            var num: Int = 0
+            for (ch in Memory.server?.raceData?.get(loc.world.name)?.checkpoint!!) {
+                num += 1
             }
-            sender.sendMessage("Successfully Added Checkpoint ${num} line To ${loc.world.name} Track!")
+            if (racerNumber > num + 1) {
+                sender.sendMessage("Not a valid number checkpoint number, current checkpoint: $num")
+
+            }
+            val replaced = RacingTracksConfigUtils.addCheckpointPos(loc, sender, racerNumber)
+            if (replaced) {
+                sender.sendMessage("Successfully replaced Checkpoint ${num} line To ${loc.world.name} Track!")
+
+            } else {
+                sender.sendMessage("Successfully Added Checkpoint ${num} line To ${loc.world.name} Track!")
+            }
         }
     }
     fun createPointyArrow(loc: Location , direction: Vector) {

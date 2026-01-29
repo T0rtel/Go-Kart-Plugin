@@ -60,65 +60,95 @@ object OnKeyToggle {
 
         Vehicle.rotation.let { lastRot ->
             if (drift && sides != 0.0f && Vehicle.velocity > MinSpeedToStartDrifting){
-                if (!Vehicle.isDrifting){
+                if (!Vehicle.isDrifting) {
                     Bukkit.broadcastMessage("started drifting")
                     Main.instance?.let {
-                        object : BukkitRunnable () {
-                            var cycles = 3
-                            var ticksPerCycle = 20
-                            var speedMax: Double = 0.6
-                            var speedAdded: Double = 0.0
-                            var SpeedTicks = 20
-
-                            var speedAddPerCycle: Double = speedMax/cycles
-                            var currentCycles = 0
-                            var i = 0
+                        object : BukkitRunnable() {
                             override fun run() {
-                                if (i % ticksPerCycle == 0 &&  i < ticksPerCycle * cycles) {
-                                    speedAdded += speedAddPerCycle
-                                    currentCycles += 1
-                                    plr.playSound(plr, Sound.BLOCK_TRIAL_SPAWNER_DETECT_PLAYER, 1f, 0.8f + (0.4f * currentCycles))
+                                object : BukkitRunnable() {
+                                    var cycles = 3
+                                    var ticksPerCycle = 20
+                                    var speedMax: Double = 0.6
+                                    var speedAdded: Double = 0.0
+                                    var SpeedTicks = 20
 
-                                }
-                                if (!Vehicle.isDrifting) {
-                                    Vehicle.velocity += speedAdded
-                                    object : BukkitRunnable () {
-                                        var i = 0
-                                        override fun run() {
-                                            if (i > SpeedTicks) {
-                                                this.cancel()
-                                                Vehicle.velocity -= speedAdded
-                                            }
-                                            val particleLoc = Vehicle.VehicleHorse.location.add(-Vehicle.VehicleHorse.location.direction.x * 3,1.2,-Vehicle.VehicleHorse.location.direction.z * 3)
-                                            val left: Vector = particleLoc.direction.clone().rotateAroundY(Math.toRadians(90.0)).multiply(0.6)
-                                            val right: Vector = particleLoc.direction.clone().rotateAroundY(Math.toRadians(-90.0)).multiply(0.6)
-                                            ParticleBuilder(org.bukkit.Particle.DUST_COLOR_TRANSITION).offset(0.2,0.2,0.2).colorTransition(org.bukkit.Color.YELLOW,org.bukkit.Color.RED).location(
-                                                Location(
-                                                    particleLoc.world,
-                                                    particleLoc.x +(left.x),
-                                                    particleLoc.y,
-                                                    particleLoc.z +(left.x)
-                                                )
-                                            ).count(5).spawn()
-                                            ParticleBuilder(org.bukkit.Particle.DUST_COLOR_TRANSITION).offset(0.2,0.2,0.2).colorTransition(org.bukkit.Color.YELLOW,org.bukkit.Color.RED).location(
-                                                Location(
-                                                    particleLoc.world,
-                                                    particleLoc.x +(right.x),
-                                                    particleLoc.y,
-                                                    particleLoc.z +(right.x)
-                                                )
-                                            ).count(5).spawn()
-                                            //println("drift 1")
-                                            i +=1
+                                    var speedAddPerCycle: Double = speedMax / cycles
+                                    var currentCycles = 0
+                                    var i = 0
+                                    override fun run() {
+                                        if (i % ticksPerCycle == 0 && i < ticksPerCycle * cycles) {
+                                            speedAdded += speedAddPerCycle
+                                            currentCycles += 1
+                                            plr.playSound(
+                                                plr,
+                                                Sound.BLOCK_TRIAL_SPAWNER_DETECT_PLAYER,
+                                                1f,
+                                                0.8f + (0.4f * currentCycles)
+                                            )
+
                                         }
-                                    }.runTaskTimer(it,0,1)
+                                        if (!Vehicle.isDrifting) {
+                                            Bukkit.broadcastMessage("" + speedAdded);
+                                            Vehicle.velocity += speedAdded
+                                            object : BukkitRunnable() {
+                                                var i = 0
+                                                override fun run() {
+                                                    if (i > SpeedTicks) {
+                                                        this.cancel()
+                                                        Vehicle.velocity -= speedAdded
+                                                    }
+                                                    val particleLoc = Vehicle.VehicleHorse.location.add(
+                                                        -Vehicle.VehicleHorse.location.direction.x * 3,
+                                                        1.2,
+                                                        -Vehicle.VehicleHorse.location.direction.z * 3
+                                                    )
+                                                    val left: Vector =
+                                                        particleLoc.direction.clone()
+                                                            .rotateAroundY(Math.toRadians(90.0))
+                                                            .multiply(0.6)
+                                                    val right: Vector =
+                                                        particleLoc.direction.clone()
+                                                            .rotateAroundY(Math.toRadians(-90.0))
+                                                            .multiply(0.6)
+                                                    ParticleBuilder(org.bukkit.Particle.DUST_COLOR_TRANSITION).offset(
+                                                        0.2,
+                                                        0.2,
+                                                        0.2
+                                                    ).colorTransition(org.bukkit.Color.YELLOW, org.bukkit.Color.RED)
+                                                        .location(
+                                                            Location(
+                                                                particleLoc.world,
+                                                                particleLoc.x + (left.x),
+                                                                particleLoc.y,
+                                                                particleLoc.z + (left.x)
+                                                            )
+                                                        ).count(5).spawn()
+                                                    ParticleBuilder(org.bukkit.Particle.DUST_COLOR_TRANSITION).offset(
+                                                        0.2,
+                                                        0.2,
+                                                        0.2
+                                                    ).colorTransition(org.bukkit.Color.YELLOW, org.bukkit.Color.RED)
+                                                        .location(
+                                                            Location(
+                                                                particleLoc.world,
+                                                                particleLoc.x + (right.x),
+                                                                particleLoc.y,
+                                                                particleLoc.z + (right.x)
+                                                            )
+                                                        ).count(5).spawn()
+                                                    //println("drift 1")
+                                                    i += 1
+                                                }
+                                            }.runTaskTimer(it, 0, 1)
 
-                                    this.cancel()
-                                }
-                                i +=1
+                                            this.cancel()
+                                        }
+                                        i += 1
+                                    }
+                                }.runTaskTimer(it, 0, 1)
                             }
-                        }.runTaskTimer(it, 0, 1)
-                    }
+                        }.runTaskLater(it,20)
+                }
                     Vehicle.isDrifting = true
                     if (sides == -0.98f){
                         Vehicle.DriftingDir = "right"

@@ -6,14 +6,15 @@ import io.papermc.paper.entity.TeleportFlag
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.Sound
 import org.bukkit.entity.*
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.Vector
 import tortel.gokartsecondtry.Main
 import tortel.gokartsecondtry.Utils.CONSTANTS
-import tortel.gokartsecondtry.Utils.Race.RaceUtils.PlayersInRace
-import tortel.gokartsecondtry.Utils.Race.RaceUtils.RaceStarted
+
 import tortel.gokartsecondtry.Vehicle.VehicleManager
+import tortel.gokartsecondtry.data.Memory
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -29,22 +30,23 @@ object VehicleUtils {
     )
 
     //driving
-    val Acceleration = 0.05 //per tick
-    val deceleration = 0.01
-    val braking = 0.1
-    val MaxSpeed = 0.8 // 0.8 * 20 = 16 blocks/second
-    val MaxRotationSpeed = 3f // 3f
-    val bouncePower = -2.5
-    val GravityValue = -2.5
-
+    private const val Acceleration = 0.05 //per tick
+    private const val deceleration = 0.01
+    private const val braking = 0.1
+    const val MaxSpeed = 0.8 // 0.8 * 20 = 16 blocks/second
+    const val MaxRotationSpeed = 3f // 3f
+    const val bouncePower = -2.5
+    const val GravityValue = -2.5
+    const val boostPadAmount = 0.3
+    const val boostItemAmount = 0.2
     //drifting
-    val driftingforwardSpeed = 1 // Increased forward speed
-    val driftingdiagonalOffset = 0.3 // Decreased rightward offset
+    private const val driftingforwardSpeed = 1 // Increased forward speed
+    private const val driftingdiagonalOffset = 0.3 // Decreased rightward offset
 
-    val DriftingStartOffset = 15f // when we start drifting, rotate this much to start drifting
-    val MaxDriftingRotationSpeed = 6f
-    val MinDriftingRotationSpeed = 4f
-    val MaxDriftingSpeed = 0.5
+    const val DriftingStartOffset = 15f // when we start drifting, rotate this much to start drifting
+    private const val MaxDriftingRotationSpeed = 6f
+    private const val MinDriftingRotationSpeed = 4f
+    const val MaxDriftingSpeed = 0.5
     const val MinSpeedToStartDrifting = 0.03 // half the maxspeed
 
     //TODO: ADD NEW ROTATION VARIABLE, CHANGE FROM vehicle.velocity TO vehicle.setdeltaspeed or some shi
@@ -70,6 +72,183 @@ object VehicleUtils {
         }
          */
 
+    }
+
+    fun jump(plr : Player) {
+        val VehicleManager = getVehicleManager()!!
+        val Vehicle = VehicleManager.getVehicle(plr)
+        object : BukkitRunnable() {
+            var tick = 0
+            override fun run() {
+                if (tick == 5) {
+                    Vehicle.VehicleHorse.velocity = Vector(Vehicle.VehicleHorse.velocity.x, 1.0, Vehicle.VehicleHorse.velocity.z)
+
+                    this.cancel()
+
+                }
+
+                tick++
+            }
+        }.runTaskTimer(Main.instance!!,0,1)
+    }
+
+    fun miniKnockout(plr : Player) {
+        val VehicleManager = getVehicleManager()!!
+        val Vehicle = VehicleManager.getVehicle(plr)
+        if (Memory.getPlayerMemory(plr)?.shields!! > 0) {
+            Memory.getPlayerMemory(plr)?.shields = Memory.getPlayerMemory(plr)?.shields!! - 1
+            plr.world.playSound(plr.location,Sound.BLOCK_ANVIL_LAND,1f,2f)
+
+            return
+        }
+        Vehicle.stopped = true
+        plr.world.playSound(plr.location, Sound.ENTITY_VILLAGER_HURT,1f,1f)
+        plr.world.playSound(plr.location, Sound.BLOCK_TRIAL_SPAWNER_OMINOUS_ACTIVATE,1f,2f)
+        object : BukkitRunnable() {
+            var ticks = 0
+            val radius = 1.2
+            val speed = 0.2
+            var angle = 0.0
+            override fun run() {
+                if (ticks < 15) {
+                    val a = Vehicle.VehicleHorse.location
+                    a.yaw += ((360 / 15) * ticks)
+                    Vehicle.VehicleHorse.teleport(a)
+                    Vehicle.VehicleItemDisplays[1].setRotation(a.yaw, 0.0f)
+                    Vehicle.VehicleItemDisplays[2].setRotation(a.yaw, 0.0f)
+                }
+                angle += speed
+                val x = plr.location.x + radius * cos(angle)
+                val z = plr.location.z + radius * sin(angle)
+                val particleLocation = Location(plr.location.world, x, plr.eyeLocation.y+0.5, z)
+                ParticleBuilder(org.bukkit.Particle.WAX_OFF).count(1).location(particleLocation).extra(0.5).spawn()
+                if (ticks >= 15) {
+                    Vehicle.stopped = false
+                    this.cancel()
+                }
+                ticks++
+            }
+
+        }.runTaskTimer(Main.instance!!,0,1)
+    }
+
+    fun knockout(plr : Player) {
+        val VehicleManager = getVehicleManager()!!
+        val Vehicle = VehicleManager.getVehicle(plr)
+        if (Memory.getPlayerMemory(plr)?.shields!! > 0) {
+            Memory.getPlayerMemory(plr)?.shields = Memory.getPlayerMemory(plr)?.shields!! - 1
+            plr.world.playSound(plr.location,Sound.BLOCK_ANVIL_LAND,1f,2f)
+
+            return
+        }
+        Vehicle.stopped = true
+        plr.world.playSound(plr.location, Sound.ENTITY_VILLAGER_HURT,1f,1f)
+        plr.world.playSound(plr.location, Sound.BLOCK_TRIAL_SPAWNER_OMINOUS_ACTIVATE,1f,2f)
+        object : BukkitRunnable() {
+            var ticks = 0
+            val radius = 1.2
+            val speed = 0.2
+            var angle = 0.0
+            override fun run() {
+                if (ticks < 15) {
+                    val a = Vehicle.VehicleHorse.location
+                    a.yaw += ((360 / 15) * ticks)
+                    Vehicle.VehicleItemDisplays[1].setRotation(a.yaw, 0.0f)
+                    Vehicle.VehicleItemDisplays[2].setRotation(a.yaw, 0.0f)
+
+                    Vehicle.VehicleHorse.teleport(a)
+                }
+                angle += speed
+                val x = plr.location.x + radius * cos(angle)
+                val z = plr.location.z + radius * sin(angle)
+                val particleLocation = Location(plr.location.world, x, plr.eyeLocation.y+0.5, z)
+                ParticleBuilder(org.bukkit.Particle.WAX_OFF).count(1).location(particleLocation).extra(0.5).spawn()
+                if (ticks >= 35) {
+                    Vehicle.stopped = false
+                    this.cancel()
+                }
+                ticks++
+            }
+
+        }.runTaskTimer(Main.instance!!,0,1)
+    }
+
+    fun stop(plr : Player) {
+        val VehicleManager = getVehicleManager()!!
+        val Vehicle = VehicleManager.getVehicle(plr)
+        Vehicle.stopped = true
+    }
+    fun unstop(plr : Player) {
+        val VehicleManager = getVehicleManager()!!
+        val Vehicle = VehicleManager.getVehicle(plr)
+        Vehicle.stopped = false
+    }
+    fun boost(plr : Player) {
+        val VehicleManager = getVehicleManager()!!
+        val Vehicle = VehicleManager.getVehicle(plr)
+        if (Memory.getPlayerMemory(plr)?.boosting!!) {
+            return
+        }
+        Memory.getPlayerMemory(plr)?.boosting = true
+        object : BukkitRunnable() {
+            var tick = 0
+            override fun run() {
+                // set vehicle to max velocity plus boost value
+                Vehicle.velocity = MaxSpeed + boostPadAmount
+                if (tick == 40) {
+                    Memory.getPlayerMemory(plr)?.boosting = false
+                    this.cancel()
+
+                }
+
+                boostParticle(Vehicle.VehicleHorse)
+                tick++
+            }
+        }.runTaskTimer(Main.instance!!, 0, 1)
+    }
+        fun boostItem(plr : Player) {
+            val VehicleManager = getVehicleManager()!!
+            val Vehicle = VehicleManager.getVehicle(plr)
+            if (Memory.getPlayerMemory(plr)?.boosting!!) {
+                return
+            }
+            Memory.getPlayerMemory(plr)?.boosting = true
+            object : BukkitRunnable() {
+                var tick = 0
+                override fun run() {
+                    // set vehicle to max velocity plus boost value
+                    Vehicle.velocity = MaxSpeed + boostItemAmount
+                    if (tick == 30) {
+                        Memory.getPlayerMemory(plr)?.boosting = false
+                        this.cancel()
+
+                    }
+
+                    boostParticle(Vehicle.VehicleHorse)
+                    tick++
+                }
+            }.runTaskTimer(Main.instance!!,0,1)
+    }
+    fun boostParticle (Vehicle: Entity) {
+        val particleLoc = Vehicle.location.add(-Vehicle.location.direction.x,0.0,-Vehicle.location.direction.z)
+        val left: Vector = particleLoc.direction.clone().rotateAroundY(Math.toRadians(90.0)).multiply(0.6)
+        val right: Vector = particleLoc.direction.clone().rotateAroundY(Math.toRadians(-90.0)).multiply(0.6)
+
+        ParticleBuilder(org.bukkit.Particle.CAMPFIRE_COSY_SMOKE).location(particleLoc).count(4).offset(0.25,0.2,0.25).extra(0.0).spawn()
+        ParticleBuilder(org.bukkit.Particle.DUST).offset(0.0,0.1,0.0).color(org.bukkit.Color.BLACK).location(
+            Location(
+                particleLoc.world,
+                particleLoc.x +(left.x),
+                particleLoc.y,
+                particleLoc.z +(left.x)
+            )).count(2).spawn()
+        ParticleBuilder(org.bukkit.Particle.DUST).offset(0.0,0.1,0.0).color(org.bukkit.Color.BLACK).location(
+            Location(
+                particleLoc.world,
+                particleLoc.x +(right.x),
+                particleLoc.y,
+                particleLoc.z +(right.x)
+            )).count(2).spawn()
     }
     //TODO: FIX STOPPING AND STARTING RACE AGAIN MULTIPLIES THE STEERING :(
     fun SteerRight(plr : Player){
@@ -191,6 +370,8 @@ object VehicleUtils {
         }
 
     }
+
+
 
     fun DecreaseVel(plr: Player) {
         val VehicleManager = getVehicleManager()!!
@@ -333,8 +514,13 @@ object VehicleUtils {
 
     }
 
-    fun applyAccVelocity(Velocity : Double , Horse : Entity, SpeedVector : Vector){
-
+    fun applyAccVelocity(Velocity : Double , Horse : Entity, SpeedVector : Vector, plr : Player){
+        val VehicleManager = getVehicleManager()!!
+        val Vehicle = VehicleManager.getVehicle(plr)
+        if (Vehicle.stopped) {
+            Horse.velocity = Vector(0.0,0.0,0.0)
+            return;
+        }
         Horse.velocity = Vector(Horse.location.direction.x, 0.5, Horse.location.direction.z).multiply(
             //Vector(Velocity, GravityValue, Velocity)
             SpeedVector
@@ -348,7 +534,7 @@ object VehicleUtils {
         val keys = Vehicle.playerKeyState
         if (!keys.dPressed && !keys.aPressed) {// player let go of both a and d key
             DecreaseVel(plr)
-            applyAccVelocity(Velocity, Horse, SpeedVector)
+            applyAccVelocity(Velocity, Horse, SpeedVector, plr)
             return
         }
         val radians = Math.toRadians(Horse.location.yaw.toDouble())
@@ -375,14 +561,14 @@ object VehicleUtils {
         }
     }
     //TODO: FIX TURNING/DRIFTING DIFFER FROM PERSON TO PERSON (FASTER/SLOWER)
-    fun startVehicleTicking(){
+    fun startVehicleTicking(id : String){
 
         val VehicleManager = getVehicleManager()!!
-
+        val plyrs = Memory.server?.races?.get(id)?.PlayersInRace!!
         object : BukkitRunnable() {
             override fun run() {
-                if (!RaceStarted) return
-                for (plr in PlayersInRace) {
+                if (!Memory.server?.races?.containsKey(id)!!) return
+                for (plr in plyrs) {
                     val Vehicle = VehicleManager.getVehicle(plr)
                     // VELOCITY
                     if (Vehicle.isAccelerating){
@@ -393,7 +579,6 @@ object VehicleUtils {
                         Brake(plr)
                     }
                     if (Vehicle.isDrifting){
-                        //TODO: ADD DRIFTING
                         drift(plr, Vehicle.playerKeyState)
                     }
 
@@ -427,7 +612,8 @@ object VehicleUtils {
                         applyDriftingOffset(plr, Velocity, Vehicle.VehicleHorse, SpeedVector)
                     }
                     if (!Vehicle.isDrifting){ // Vehicle.isAccelerating &&
-                        applyAccVelocity(Velocity, Vehicle.VehicleHorse, SpeedVector)
+                        applyAccVelocity(Velocity, Vehicle.VehicleHorse, SpeedVector, plr)
+
                     }//w
 
                     // DECELERATION
@@ -440,6 +626,6 @@ object VehicleUtils {
                 }
 
             }
-        }.runTaskTimer(Main.instance!!, 1, 1)
+        }.runTaskTimer(Main.instance!!, 0, 1)
     }
 }

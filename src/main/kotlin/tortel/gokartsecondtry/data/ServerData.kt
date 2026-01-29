@@ -1,7 +1,10 @@
 package tortel.gokartsecondtry.data
 
 class ServerData {
-
-    var checkpoint : HashMap<String, MutableList<Checkpoint>> = HashMap()
-    var finishLine : HashMap<String, Checkpoint> = HashMap()
+    //todo:save
+    //----Saved-----
+    var raceData : HashMap<String, RaceData> = HashMap()
+    //----Temp-----
+    var races : HashMap<String, TempRaceData> = HashMap()
+    var queues : HashMap<String, TempQueue> = HashMap()
 }

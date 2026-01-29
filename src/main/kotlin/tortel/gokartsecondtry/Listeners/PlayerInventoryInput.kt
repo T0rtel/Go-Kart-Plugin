@@ -15,7 +15,9 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.util.Vector
+import tortel.gokartsecondtry.Main
 import tortel.gokartsecondtry.data.Memory
+import tortel.gokartsecondtry.Utils.items
 
 class PlayerInventoryInput : Listener {
     @EventHandler
@@ -35,6 +37,70 @@ class PlayerInventoryInput : Listener {
                         }
             }
             event.isCancelled = true
+        }
+    }
+
+    @EventHandler
+    fun interact(e: PlayerInteractEvent) {
+        if (e.item?.hasItemMeta()!!) {
+            val plr = e.player
+            if (e.item?.itemMeta?.persistentDataContainer?.has(
+                    NamespacedKey(Main.instance!!, "box"),
+                    PersistentDataType.STRING
+                )!!
+            ) {
+                when (e.item?.itemMeta?.persistentDataContainer?.get(
+                    NamespacedKey(Main.instance!!, "box"),
+                    PersistentDataType.STRING
+                )!!) {
+                    "speedb" -> {
+                        items().speedb(plr)
+                    }
+
+                   /* "rocket" -> {
+                        items().rocket(plr)
+                    }*/
+
+                    "missile" -> {
+                        items().missile(plr)
+                    }
+
+                    "fireball" -> {
+                        items().fireball(plr)
+                    }
+
+                    "lightning" -> {
+                        items().lightning(plr)
+                    }
+
+                    "banana" -> {
+                        items().banana(plr)
+                    }
+
+                    "spider" -> {
+                        items().spider(plr)
+                    }
+
+                    "tnt" -> {
+                        items().tnt(plr)
+                    }
+
+                    "shield" -> {
+                        items().shield(plr)
+                    }
+
+                    "smoke" -> {
+                        items().smoke(plr)
+                    }
+
+                    else -> {
+                        // Handle unknown items or do nothing
+                    }
+
+                }
+                plr.inventory.remove(e.item!!)
+                Memory.getPlayerMemory(plr)?.currentItem = ""
+            }
         }
     }
 
@@ -59,11 +125,11 @@ class PlayerInventoryInput : Listener {
             }
         }
     }
-    fun push(previousSlot: Int, newSlot: Int): Boolean {
+    private fun push(previousSlot: Int, newSlot: Int): Boolean {
         return (newSlot > previousSlot || (previousSlot == 8 && newSlot == 0))
     }
 
-    fun pull(previousSlot: Int, newSlot: Int): Boolean {
+    private fun pull(previousSlot: Int, newSlot: Int): Boolean {
         return (newSlot < previousSlot || (previousSlot == 0 && newSlot == 8))
     }
     @EventHandler
@@ -153,18 +219,27 @@ class PlayerInventoryInput : Listener {
                 )
                 val plr: Player = event.whoClicked as Player
                 if (sr == "boost") {
-                    val item2 = ItemStack(Material.GOLD_INGOT)
+                    val item2 = ItemStack(Material.MAGENTA_GLAZED_TERRACOTTA)
                     val itemMeta2 = item2.itemMeta
                     itemMeta2?.setDisplayName("§eSpeed boost")
                     itemMeta2?.persistentDataContainer?.set(
                         NamespacedKey("gokart", "what"),
                         PersistentDataType.STRING,
-                        "boost"
+                        "boosta"
                     )
                     item2.itemMeta = itemMeta2
                     plr.inventory.addItem(item2)
                 } else if (sr == "jump") {
-
+                    val item2 = ItemStack(Material.PINK_GLAZED_TERRACOTTA)
+                    val itemMeta2 = item2.itemMeta
+                    itemMeta2?.setDisplayName("§eJump pad")
+                    itemMeta2?.persistentDataContainer?.set(
+                        NamespacedKey("gokart", "what"),
+                        PersistentDataType.STRING,
+                        "jumpa"
+                    )
+                    item2.itemMeta = itemMeta2
+                    plr.inventory.addItem(item2)
                 } else if (sr == "launch") {
 
                 }

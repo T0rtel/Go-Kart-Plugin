@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
-    kotlin("jvm") version "2.2.0-RC"
+    kotlin("jvm") version "2.0.0"
     id("com.gradleup.shadow") version "8.3.0"
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id("com.github.johnrengelman.shadow") version "8.1.1"
@@ -25,7 +25,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.2.0-RC")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
     // https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-sync
     implementation("org.mongodb:mongodb-driver-sync:5.5.0")
 
