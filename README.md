@@ -1,8 +1,8 @@
 # Minecraft Go-Kart Project — 100% Vanilla
 
-![Gameplay preview](pictures/example.gif)
+Mario Kart–style go-karting plugin for Paper 1.21, built with no client mod. Karts, drifting, and checkpoints are all done with horses, item displays, and packet-level input reading. Built for **Clobnet** (now shut down), archived here unfinished.
 
-Mario Kart–style go-karting plugin for Paper 1.21, built with no client mod and no resource pack required. Karts, drifting, and checkpoints are all done with horses, item displays, and packet-level input reading. Built for **Clobnet** (now shut down), archived here unfinished.
+![Gameplay preview](vids/example.gif)
 
 ## How it works
 
@@ -29,7 +29,7 @@ Mario Kart–style go-karting plugin for Paper 1.21, built with no client mod an
 - Paper 1.21.x (uses Paper-only APIs, not plain Spigot/Bukkit)
 - [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/) — required
 - [ViaVersion](https://viaversion.com/) optional, to let newer clients join a 1.21 server
-- No resource pack needed
+- A custom resource pack is optional, but recommended for better visuals. The plugin will work without it, but the default horse model will be used for karts.
 
 ## Known Issues
 
