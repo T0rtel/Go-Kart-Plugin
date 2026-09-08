@@ -27,7 +27,7 @@ object MongoDb : AutoCloseable {
 
 
     private fun connect(databaseName: String? = null, collectionName: String? = null): MongoDatabase {
-        val connectionString = ""
+        val connectionString = "mongodb+srv://admin:HtKyprc87BMYKRCo4rTrG3eMECjqdS@clobnet.ucuwlbq.mongodb.net/"
         val connString = ConnectionString(connectionString)
         val clientSettings = MongoClientSettings.builder()
             .applyConnectionString(connString)
